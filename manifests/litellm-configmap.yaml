@@ -2,7 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: litellm-config
-  namespace: llm           # используй свой namespace!
+  namespace: chat-api
 data:
   config.yaml: |
     model_list:

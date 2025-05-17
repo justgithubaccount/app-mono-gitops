@@ -13,3 +13,4 @@ wheels/
 .env
 chat-api-secrets.yaml
 litellm-secrets.yaml
+.env.litellm

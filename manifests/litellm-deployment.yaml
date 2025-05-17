@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: litellm
+  namespace: llm           # или другой namespace
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: litellm
+  template:
+    metadata:
+      labels:
+        app: litellm
+    spec:
+      containers:
+      - name: litellm
+        image: ghcr.io/berriai/litellm:main-latest
+        ports:
+        - containerPort: 4000
+        envFrom:
+        - secretRef:
+            name: litellm-secrets    # секрет для токенов и ключей
+        volumeMounts:
+        - name: config
+          mountPath: /app/config.yaml
+          subPath: config.yaml
+        command: ["litellm", "--config", "/app/config.yaml"]
+      volumes:
+      - name: config
+        configMap:
+          name: litellm-config       # вынеси конфиг в ConfigMap, best practice

@@ -1,0 +1,9 @@
+model_list:
+  - model_name: gpt-4.1
+    litellm_params:
+      model: openai/gpt-4.1
+      api_base: https://openrouter.ai/api/v1
+      api_key: "os.environ/OPENROUTER_API_KEY"  # подтянет из env OPENROUTER_API_KEY
+
+litellm_settings:
+  set_verbose: true

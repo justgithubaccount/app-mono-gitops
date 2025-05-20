@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: chat-api
-          image: ghcr.io/justgithubaccount/chat-api:latest
+          image: ghcr.io/justgithubaccount/chat-api:2e27583
           ports:
             - containerPort: 8000
           envFrom:

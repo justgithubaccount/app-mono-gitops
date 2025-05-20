@@ -8,7 +8,7 @@ class Settings(BaseSettings):
     """
     openai_api_key: str = ""
     llm_api_url: str = "http://localhost:4000"
-    chat_model: str = "openai/gpt-4o"
+    chat_model: str = "openai/gpt-4.1"
     project_name: str = "ChatMicroservice"
 
     class Config:

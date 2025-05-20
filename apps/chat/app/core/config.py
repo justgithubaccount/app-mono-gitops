@@ -1,12 +1,13 @@
 from pydantic_settings import BaseSettings
 from functools import lru_cache
+import os
 
 class Settings(BaseSettings):
     """
     Конфиг всего приложения.
     Все переменные тянутся из .env — легко расширять и объяснять новым людям.
     """
-    openai_api_key: str = ""
+    openai_api_key: str = os.getenv("OPENAI_API_KEY", "")
     llm_api_url: str = "http://localhost:4000"
     chat_model: str = "openai/gpt-4.1"
     project_name: str = "ChatMicroservice"

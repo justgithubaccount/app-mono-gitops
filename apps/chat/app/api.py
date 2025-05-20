@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException, status, Depends
 from .schemas import ChatRequest, ChatResponse
 from .services.chat_service import ChatService
+import traceback
 
 api_router = APIRouter(
     prefix="/api/v1",
@@ -27,4 +28,6 @@ async def chat_endpoint(
         reply = await chat_service.get_ai_reply(req.messages, req.user_api_key)
         return ChatResponse(reply=reply)
     except Exception as e:
+        print("Ошибка в chat_endpoint:", e)
+        traceback.print_exc()
         raise HTTPException(status_code=500, detail="AI сервис недоступен")

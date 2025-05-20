@@ -1,6 +1,5 @@
 from fastapi import APIRouter, HTTPException, status, Depends
-from typing import List
-from .schemas import ChatRequest, ChatResponse, Message
+from .schemas import ChatRequest, ChatResponse
 from .services.chat_service import ChatService
 
 api_router = APIRouter(
@@ -8,7 +7,6 @@ api_router = APIRouter(
     tags=["chat"]
 )
 
-# Dependency — chat service (можно мокать и расширять)
 def get_chat_service():
     return ChatService()
 
@@ -26,8 +24,7 @@ async def chat_endpoint(
     Асинхронно получить ответ от AI/LLM на список сообщений.
     """
     try:
-        reply = await chat_service.get_ai_reply(req.messages)
+        reply = await chat_service.get_ai_reply(req.messages, req.user_api_key)
         return ChatResponse(reply=reply)
     except Exception as e:
-        # Можно добавить кастомный exception handler для разных ошибок
         raise HTTPException(status_code=500, detail="AI сервис недоступен")

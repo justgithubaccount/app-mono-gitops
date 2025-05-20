@@ -34,6 +34,7 @@ class ChatRequest(BaseModel):
 
 class ChatResponse(BaseModel):
     reply: str = Field(..., description="Ответ LLM/AI")
+    user_api_key: Optional[str] = Field(None, description="API-ключ клиента для доступа к OpenRouter")
 
     class Config:
         schema_extra = {

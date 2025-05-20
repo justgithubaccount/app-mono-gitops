@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 from ..schemas import Message
 from ..core.config import get_settings
 import httpx
@@ -15,17 +15,21 @@ class LLMClient:
     def __init__(self, settings=None):
         self.settings = settings or get_settings()
 
-    async def generate_reply(self, messages: List[Message]) -> str:
+    async def generate_reply(self, messages: List[Message], user_api_key: Optional[str] = None) -> str:
         payload = {
             "model": self.settings.chat_model,
             "messages": [m.dict() for m in messages],
         }
+
+        # Используем ключ клиента, если передан, иначе дефолтный из настроек
+        api_key = user_api_key or self.settings.openai_api_key
+
         try:
             async with httpx.AsyncClient(timeout=15.0) as client:
                 response = await client.post(
                     f"{self.settings.llm_api_url}/chat/completions",
                     json=payload,
-                    headers={"Authorization": f"Bearer {self.settings.openai_api_key}"}
+                    headers={"Authorization": f"Bearer {api_key}"}
                 )
                 response.raise_for_status()
                 data = response.json()
@@ -36,8 +40,8 @@ class LLMClient:
             logger.error(f"LLM-proxy error: {e.response.status_code} {e.response.text}")
             raise
 
-        # Проверяем, что пришёл ожидаемый ответ
         if "choices" not in data or not data["choices"]:
             logger.error(f"Malformed LLM response: {data}")
             raise ValueError("Malformed LLM response")
+
         return data["choices"][0]["message"]["content"]

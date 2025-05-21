@@ -11,5 +11,5 @@ class ChatService:
         self.llm_client = llm_client or LLMClient()
 
     async def get_ai_reply(self, messages: List[Message], user_api_key: Optional[str] = None) -> str:
-        reply = await self.llm_client.generate_reply(messages, user_api_key)
+        reply = await self.llm_client.generate_reply(messages)
         return reply

@@ -15,21 +15,17 @@ class LLMClient:
     def __init__(self, settings=None):
         self.settings = settings or get_settings()
 
-    async def generate_reply(self, messages: List[Message], user_api_key: Optional[str] = None) -> str:
+    async def generate_reply(self, messages: List[Message]) -> str:
         payload = {
             "model": self.settings.chat_model,
             "messages": [m.dict() for m in messages],
         }
-
-        # Используем ключ клиента, если передан, иначе дефолтный из настроек
-        api_key = user_api_key or self.settings.openai_api_key
 
         try:
             async with httpx.AsyncClient(timeout=15.0) as client:
                 response = await client.post(
                     f"{self.settings.llm_api_url}/chat/completions",
                     json=payload,
-                    # headers={"Authorization": f"Bearer {api_key}"}
                 )
                 response.raise_for_status()
                 data = response.json()

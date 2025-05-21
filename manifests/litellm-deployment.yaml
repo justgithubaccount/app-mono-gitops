@@ -25,7 +25,7 @@ spec:
         - name: config
           mountPath: /app/config.yaml
           subPath: config.yaml
-        command: ["litellm", "--config", "/app/config.yaml"]
+        command: ["proxy-server", "--config", "/app/config.yaml"]
       volumes:
       - name: config
         configMap:

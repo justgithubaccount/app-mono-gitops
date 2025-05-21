@@ -29,7 +29,7 @@ class LLMClient:
                 response = await client.post(
                     f"{self.settings.llm_api_url}/chat/completions",
                     json=payload,
-                    headers={"Authorization": f"Bearer {api_key}"}
+                    # headers={"Authorization": f"Bearer {api_key}"}
                 )
                 response.raise_for_status()
                 data = response.json()

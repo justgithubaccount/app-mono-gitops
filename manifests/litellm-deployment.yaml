@@ -23,14 +23,11 @@ spec:
         envFrom:
         - secretRef:
             name: litellm-secrets
-        env:
-        - name: LITELLM_CONFIG_PATH
-          value: /app/config.yaml
         volumeMounts:
         - name: config
           mountPath: /app/config.yaml
           subPath: config.yaml
-        command: ["uvicorn", "litellm.main:app", "--host", "0.0.0.0", "--port", "4000"]
+        args: ["--config", "/app/config.yaml"]
       volumes:
       - name: config
         configMap:

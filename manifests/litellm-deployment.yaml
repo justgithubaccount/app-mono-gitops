@@ -15,20 +15,40 @@ spec:
       labels:
         app: litellm
     spec:
-      containers:
-      - name: litellm
-        image: ghcr.io/berriai/litellm:main-latest
-        ports:
-        - containerPort: 4000
-        envFrom:
-        - secretRef:
-            name: litellm-secrets
-        volumeMounts:
-        - name: config
-          mountPath: /app/config.yaml
-          subPath: config.yaml
-        args: ["--config", "/app/config.yaml"]
       volumes:
-      - name: config
-        configMap:
-          name: litellm-config
+        - name: config
+          configMap:
+            name: litellm-config
+        - name: logs
+          emptyDir: {}
+        - name: vector-config
+          configMap:
+            name: litellm-vector-config
+      containers:
+        - name: litellm
+          image: ghcr.io/berriai/litellm:main-latest
+          ports:
+            - containerPort: 4000
+          envFrom:
+            - secretRef:
+                name: litellm-secrets
+          volumeMounts:
+            - name: config
+              mountPath: /app/config.yaml
+              subPath: config.yaml
+            - name: logs
+              mountPath: /var/log/litellm
+          args: ["--config", "/app/config.yaml", "--log-file", "/var/log/litellm/app.log"]
+
+        - name: vector
+          image: timberio/vector:0.47.X-debian
+          command: ["/usr/bin/vector"]
+          args: ["--config", "/etc/vector/vector.toml"]
+          ports:
+            - containerPort: 4317
+              name: otlp-grpc
+          volumeMounts:
+            - name: logs
+              mountPath: /var/log/litellm
+            - name: vector-config
+              mountPath: /etc/vector

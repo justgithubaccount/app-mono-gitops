@@ -15,6 +15,12 @@ spec:
       labels:
         app: chat-api
     spec:
+      volumes:
+        - name: logs
+          emptyDir: {}
+        - name: vector-config
+          configMap:
+            name: vector-config
       containers:
         - name: chat-api
           image: ghcr.io/justgithubaccount/chat-api:latest
@@ -35,3 +41,18 @@ spec:
               port: 8000
             initialDelaySeconds: 2
             periodSeconds: 10
+          volumeMounts:
+            - name: logs
+              mountPath: /var/log/chat
+          command: ["/bin/sh", "-c"]
+          args: ["uvicorn app.main:app > /var/log/chat/app.log 2>&1"]
+
+        - name: vector
+          image: timberio/vector:0.47.X-debian
+          command: ["/usr/bin/vector"]
+          args: ["--config", "/etc/vector/vector.toml"]
+          volumeMounts:
+            - name: logs
+              mountPath: /var/log/chat
+            - name: vector-config
+              mountPath: /etc/vector

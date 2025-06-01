@@ -1,0 +1,43 @@
+[api]
+enabled = true
+address = "0.0.0.0:8686"
+
+[sources.docker_logs]
+type = "file"
+include = ["/var/lib/docker/containers/*/*-json.log"]
+read_from = "beginning"
+ignore_older = 86400 # 1 день (опционально, чтобы не подхватывал слишком старые логи)
+
+[transforms.parse_json]
+type = "remap"
+inputs = ["docker_logs"]
+source = '''
+.structured = parse_json!(.message)
+if is_object(.structured) {
+  . = merge!(., .structured)  # 👈 безопасное слияние JSON-полей
+}
+'''
+
+[transforms.ensure_fields]
+type = "remap"
+inputs = ["parse_json"]
+source = '''
+if !exists(.model) { .model = "unknown" }
+if !exists(.project_id) { .project_id = "unknown" }
+if !exists(.level) { .level = "unknown" }
+if !exists(.job) { .job = "unknown" }
+'''
+
+[sinks.loki]
+type = "loki"
+inputs = ["ensure_fields"]
+endpoint = "http://loki:3100"
+
+[sinks.loki.labels]
+job = "{{ job }}"
+model = "{{ model }}"
+project_id = "{{ project_id }}"
+level = "{{ level }}"
+
+[sinks.loki.encoding]
+codec = "json"

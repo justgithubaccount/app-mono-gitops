@@ -8,8 +8,8 @@ services:
     ports:
       - "4000:4000"
     volumes:
-      - ./litellm-config.yaml:/app/config.yaml
-    command: --config /app/config.yaml # --detailed_debug
+      - ./litellm-config.yaml:/app/config.yaml:ro
+    command: --config /app/config.yaml
     logging:
       driver: "json-file"
       options:
@@ -45,3 +45,46 @@ services:
       interval: 30s
       timeout: 5s
       retries: 3
+
+  loki:
+    image: grafana/loki:3.5.1
+    container_name: loki
+    ports:
+      - "3100:3100"
+    environment:
+      - LOKI_LOG_LEVEL=warn
+    volumes:
+      - ./loki-config.yaml:/etc/loki/config.yaml
+    command: -config.file=/etc/loki/config.yaml -log.level=info
+    restart: unless-stopped
+
+  vector:
+    image: timberio/vector:0.47.0-debian
+    container_name: vector
+    restart: unless-stopped
+    command: ["--config", "/etc/vector/vector.toml"]
+    volumes:
+      - ./vector.toml:/etc/vector/vector.toml:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+    depends_on:
+      - loki
+
+  grafana:
+    image: grafana/grafana:10.2.2
+    container_name: grafana
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_AUTH_ANONYMOUS_ENABLED=false
+      - GF_SECURITY_DISABLE_INITIAL_ADMIN_CHANGE=true
+      - GF_LOG_LEVEL=warn
+    volumes:
+      - grafana-storage:/var/lib/grafana
+      - ./provisioning/datasources:/etc/grafana/provisioning/datasources
+
+volumes:
+  loki-data:
+  grafana-storage:

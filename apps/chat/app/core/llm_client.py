@@ -1,54 +1,79 @@
-from typing import List
+from typing import List, Optional
 from ..schemas import Message
 from ..core.config import get_settings
+from app.logger import with_context
 import httpx
-import logging
-import json
-
-logger = logging.getLogger("llm-client")
+import time
 
 class LLMClient:
-    """
-    LLMClient отвечает за запросы к внешнему LLM-proxy (litellm/openai-proxy).
-    """
-
     def __init__(self, settings=None):
         self.settings = settings or get_settings()
-        logger.info("LLMClient initialized with:")
-        logger.info("  → chat_model: %s", self.settings.chat_model)
-        logger.info("  → llm_api_url: %s", self.settings.llm_api_url)
+        with_context(
+            event="llm_client_init",
+            model=self.settings.chat_model,
+            llm_api_url=self.settings.llm_api_url,
+        ).info("LLM client initialized")
 
-    async def generate_reply(self, messages: List[Message]) -> str:
-        payload = {
-            "model": self.settings.chat_model,
-            "messages": [m.dict() for m in messages],
-        }
+    async def generate_reply(
+        self,
+        messages: List[Message],
+        user_api_key: Optional[str] = None,
+        project_id: Optional[str] = None,
+        trace_id: Optional[str] = None,
+    ) -> str:
+        user_message = messages[-1].content if messages else ""
 
-        logger.info("🔹 Sending request to LLM")
-        logger.debug("📦 Payload: %s", json.dumps(payload, ensure_ascii=False, indent=2))
-        logger.debug("🔗 URL: %s", f"{self.settings.llm_api_url}/chat/completions")
+        log = with_context(
+            project_id=project_id,
+            user_message=user_message,
+            model=self.settings.chat_model,
+            trace_id=trace_id,
+        )
+
+        log.bind(event="llm_request_sent").info("Sending request to LLM")
 
         try:
+            start = time.time()
             async with httpx.AsyncClient(timeout=15.0) as client:
                 response = await client.post(
                     f"{self.settings.llm_api_url}/chat/completions",
-                    json=payload,
+                    json={
+                        "model": self.settings.chat_model,
+                        "messages": [m.dict() for m in messages],
+                    },
                 )
-                logger.info("📥 Response received with status %s", response.status_code)
-                logger.debug("📭 Response headers: %s", response.headers)
-                logger.debug("📄 Response body: %s", response.text)
-
                 response.raise_for_status()
                 data = response.json()
+            duration = time.time() - start
+
         except httpx.RequestError as e:
-            logger.error("❌ Request to LLM failed: %s", str(e))
+            log.bind(
+                event="llm_network_error",
+                error=str(e)
+            ).error("Network error during LLM call")
             raise
+
         except httpx.HTTPStatusError as e:
-            logger.error("❌ LLM-proxy error: %s %s", e.response.status_code, e.response.text)
+            log.bind(
+                event="llm_http_error",
+                status_code=e.response.status_code,
+                response=e.response.text
+            ).error("HTTP error during LLM call")
             raise
 
         if "choices" not in data or not data["choices"]:
-            logger.error("⚠️ Malformed LLM response: %s", data)
+            log.bind(
+                event="llm_malformed_response",
+                data=data
+            ).error("Malformed response from LLM")
             raise ValueError("Malformed LLM response")
 
-        return data["choices"][0]["message"]["content"]
+        reply = data["choices"][0]["message"]["content"]
+
+        log.bind(
+            event="llm_response_received",
+            ai_reply=reply,
+            latency=duration,
+        ).info("LLM replied successfully")
+
+        return reply

@@ -1,44 +1,51 @@
 from pydantic import BaseModel, Field
-from typing import List, Optional
 from enum import Enum
+from typing import List, Optional
+from uuid import uuid4
+from datetime import datetime
 
+# ----------------------------------------
+# 📌 Роли сообщений
+# ----------------------------------------
 class Role(str, Enum):
     user = "user"
     assistant = "assistant"
     system = "system"
 
+# ----------------------------------------
+# 📌 Базовое сообщение
+# ----------------------------------------
 class Message(BaseModel):
-    role: Role = Field(..., description="Роль отправителя ('user', 'assistant', 'system')")
-    content: str = Field(..., description="Текст сообщения")
+    role: Role
+    content: str
 
-    class Config:
-        schema_extra = {
-            "example": {
-                "role": "user",
-                "content": "Привет!"
-            }
-        }
-
+# ----------------------------------------
+# 📌 Структура запроса и ответа чата
+# ----------------------------------------
 class ChatRequest(BaseModel):
-    messages: List[Message] = Field(..., description="История чата")
-    user_api_key: Optional[str] = Field(None, description="API-ключ клиента для доступа к OpenRouter")
-
-    class Config:
-        schema_extra = {
-            "example": {
-                "messages": [
-                    {"role": "user", "content": "Привет!"},
-                    {"role": "assistant", "content": "Здравствуйте! Чем могу помочь?"}
-                ]
-            }
-        }
+    messages: List[Message]
+    user_api_key: Optional[str] = None
 
 class ChatResponse(BaseModel):
-    reply: str = Field(..., description="Ответ LLM/AI")
+    reply: str
 
-    class Config:
-        schema_extra = {
-            "example": {
-                "reply": "Здравствуйте! Чем могу помочь?"
-            }
-        }
+# ----------------------------------------
+# 📂 Память и проекты
+# ----------------------------------------
+
+class ChatMessage(BaseModel):
+    role: Role
+    content: str
+
+class ChatHistory(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid4()))
+    project_id: str
+    messages: List[ChatMessage]
+    timestamp: datetime = Field(default_factory=datetime.utcnow)
+
+class CreateProjectRequest(BaseModel):
+    name: str
+
+class ProjectInfo(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid4()))
+    name: str

@@ -1,7 +1,29 @@
 [project]
 name = "app-release"
 version = "0.1.0"
-description = "Add your description here"
+description = "AI Chat microservice with FastAPI"
 readme = "README.md"
 requires-python = ">=3.10"
-dependencies = []
+license = {text = "MIT"}
+
+authors = [
+  {name = "Jenya", email = "kulikovyevgeny@outlook.com"}
+]
+
+dependencies = [
+  "fastapi",
+  "httpx",
+  "uvicorn",
+  "pydantic",
+  "python-dotenv",
+  "pydantic-settings",
+  "python-json-logger"
+]
+
+[project.urls]
+"Homepage" = "https://github.com/justgithubaccount/app-release"
+"Documentation" = "http://localhost:8000/docs"
+"Source" = "https://github.com/justgithubaccount/app-release"
+
+[tool.uv]
+python = "3.10"

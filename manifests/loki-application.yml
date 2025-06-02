@@ -78,10 +78,6 @@ spec:
                   prefix: loki_index_
                   period: 24h
 
-        persistence:
-          enabled: true
-          size: 5Gi
-
         extraEnv:
           - name: S3_ACCESS_KEY
             valueFrom:

@@ -24,7 +24,10 @@ spec:
           storage_config:
             aws:
               s3: http://s3.twcstorage.ru
-              bucketnames: ceae9495-3a627f83-8eba-441e-b648-37d41cded627
+              bucketnames:
+                chunks: ceae9495-3a627f83-8eba-441e-b648-37d41cded627
+                ruler: ceae9495-3a627f83-8eba-441e-b648-37d41cded627
+                admin: ceae9495-3a627f83-8eba-441e-b648-37d41cded627
               access_key_id: ${S3_ACCESS_KEY}
               secret_access_key: ${S3_SECRET_KEY}
               region: ru-1

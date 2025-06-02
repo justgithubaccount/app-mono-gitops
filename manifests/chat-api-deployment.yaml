@@ -20,7 +20,7 @@ spec:
           emptyDir: {}
         - name: vector-config
           configMap:
-            name: chat-api-vector-config 
+            name: chat-api-vector-config
       containers:
         - name: chat-api
           image: ghcr.io/justgithubaccount/chat-api:latest
@@ -45,7 +45,11 @@ spec:
             - name: logs
               mountPath: /var/log/chat
           command: ["/bin/sh", "-c"]
-          args: ["uvicorn app.main:app > /var/log/chat/app.log 2>&1"]
+          args:
+            - |
+              uvicorn app.main:app --host 0.0.0.0 --port 8000 \
+              | tee /var/log/chat/app.log
+
           # resources:
           #   requests:
           #     cpu: 512m

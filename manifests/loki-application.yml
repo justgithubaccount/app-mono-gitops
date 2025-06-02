@@ -40,6 +40,10 @@ spec:
           enabled: false
         persistence:
           enabled: false
+        resultsCache:
+          enabled: false
+        chunksCache:
+          enabled: false
         loki:
           auth_enabled: false
 

@@ -33,7 +33,9 @@ spec:
         gateway:
           enabled: false
         lokiCanary:
-          enabled: false
+          enabled: true
+        test:
+          enabled: true
         grafana-agent-operator:
           enabled: false
 

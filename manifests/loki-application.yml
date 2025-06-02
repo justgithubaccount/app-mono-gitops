@@ -42,7 +42,7 @@ spec:
           enabled: true
           existingClaim: loki-pvc
           storageClass: ""  # важно оставить пустым
-          size: 5Gi        # объём должен совпадать с PVC
+          size: 10Gi        # объём должен совпадать с PVC
         resultsCache:
           enabled: false
         chunksCache:

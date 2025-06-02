@@ -62,7 +62,7 @@ spec:
               ruler: ceae9495-3a627f83-8eba-441e-b648-37d41cded627
               admin: ceae9495-3a627f83-8eba-441e-b648-37d41cded627
             s3:
-              endpoint: s3.your-domain.com
+              endpoint: s3.twcstorage.ru
               access_key_id: ${S3_ACCESS_KEY}
               secret_access_key: ${S3_SECRET_KEY}
               region: ru-1

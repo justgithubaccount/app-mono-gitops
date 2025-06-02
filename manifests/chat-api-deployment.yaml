@@ -46,13 +46,13 @@ spec:
               mountPath: /var/log/chat
           command: ["/bin/sh", "-c"]
           args: ["uvicorn app.main:app > /var/log/chat/app.log 2>&1"]
-          resources:
-            requests:
-              cpu: 512m
-              memory: 512Mi
-            limits:
-              cpu: 1024m
-              memory: 1024Mi
+          # resources:
+          #   requests:
+          #     cpu: 512m
+          #     memory: 512Mi
+          #   limits:
+          #     cpu: 1024m
+          #     memory: 1024Mi
 
         - name: vector
           image: timberio/vector:0.47.X-debian
@@ -63,10 +63,10 @@ spec:
               mountPath: /var/log/chat
             - name: vector-config
               mountPath: /etc/vector
-          resources:
-            requests:
-              cpu: 50m
-              memory: 64Mi
-            limits:
-              cpu: 150m
-              memory: 128Mi
+          # resources:
+          #   requests:
+          #     cpu: 50m
+          #     memory: 64Mi
+          #   limits:
+          #     cpu: 150m
+          #     memory: 128Mi

@@ -11,6 +11,8 @@ spec:
     targetRevision: 5.41.2
     helm:
       values: |
+        grafana-agent-operator:
+          enabled: false
         loki:
           auth_enabled: false
         singleBinary:

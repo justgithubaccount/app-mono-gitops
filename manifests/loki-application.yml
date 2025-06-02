@@ -39,7 +39,10 @@ spec:
         grafana-agent-operator:
           enabled: false
         persistence:
-          enabled: false
+          enabled: true
+          existingClaim: loki-pvc
+          storageClass: ""  # важно оставить пустым
+          size: 5Gi        # объём должен совпадать с PVC
         resultsCache:
           enabled: false
         chunksCache:

@@ -38,7 +38,8 @@ spec:
           enabled: true
         grafana-agent-operator:
           enabled: false
-
+        persistence:
+          enabled: false
         loki:
           auth_enabled: false
 

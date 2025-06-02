@@ -20,7 +20,7 @@ spec:
           emptyDir: {}
         - name: vector-config
           configMap:
-            name: vector-config
+            name: chat-api-vector-config 
       containers:
         - name: chat-api
           image: ghcr.io/justgithubaccount/chat-api:latest

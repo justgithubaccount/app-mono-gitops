@@ -1,80 +1,27 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: loki
+  name: grafana
   namespace: argocd
 spec:
   project: default
   source:
     repoURL: https://grafana.github.io/helm-charts
-    chart: loki
-    targetRevision: 6.30.1
+    chart: grafana
+    targetRevision: 9.2.1
     helm:
       values: |
-        grafana-agent-operator:
-          enabled: false
-
-        loki:
-          auth_enabled: false
-          mode: monolithic
-
-          commonConfig:
-            replication_factor: 1
-
-          storage_config:
-            aws:
-              s3: http://s3.twcstorage.ru
-              bucketnames: ceae9495-3a627f83-8eba-441e-b648-37d41cded627
-              access_key_id: ${S3_ACCESS_KEY}
-              secret_access_key: ${S3_SECRET_KEY}
-              region: ru-1
-              insecure: true
-
-          schema_config:
-            configs:
-              - from: "2024-04-01"
-                store: tsdb
-                object_store: s3
-                schema: v13
-                index:
-                  prefix: loki_index_
-                  period: 24h
-
-          limits_config:
-            allow_structured_metadata: true
-            volume_enabled: true
-
-          pattern_ingester:
-            enabled: true
-
-          ruler:
-            enable_api: true
-
-        gateway:
-          enabled: false
-
-        lokiCanary:
-          enabled: false
-
-        singleBinary:
-          replicas: 1
-
-        persistence:
-          enabled: true
-          size: 5Gi
-
-        extraEnv:
-          - name: S3_ACCESS_KEY
-            valueFrom:
-              secretKeyRef:
-                name: loki-s3-secret
-                key: access_key
-          - name: S3_SECRET_KEY
-            valueFrom:
-              secretKeyRef:
-                name: loki-s3-secret
-                key: secret_key
-
+        adminPassword: admin
+        service:
+          type: LoadBalancer
+        datasources:
+          datasources.yaml:
+            apiVersion: 1
+            datasources:
+              - name: Loki
+                type: loki
+                access: proxy
+                url: http://loki.observability.svc.cluster.local:3100
   destination:
     namespace: observability
     server: https://kubernetes.default.svc

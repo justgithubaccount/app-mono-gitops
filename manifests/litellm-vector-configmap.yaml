@@ -11,16 +11,15 @@ data:
 
     [transforms.parse]
     type = "remap"
-    inputs = ["app_logs"]
+    inputs = ["file_logs"]
     source = '''
     . = parse_json!(.message)
     '''
 
     [sinks.loki]
     type = "loki"
-    inputs = ["merge"]
+    inputs = ["parse"]
     endpoint = "http://loki.observability.svc.cluster.local:3100"
     encoding.codec = "json"
     labels.app = "litellm"
     labels.env = "public"
-

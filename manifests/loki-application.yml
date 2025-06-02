@@ -15,6 +15,11 @@ spec:
           enabled: false
         loki:
           auth_enabled: false
+          mode: monolithic
+        gateway:
+          enabled: false
+        lokiCanary:
+          enabled: false
         singleBinary:
           replicas: 1
         persistence:

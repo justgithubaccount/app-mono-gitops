@@ -17,8 +17,7 @@ spec:
           replicas: 1
           persistence:
             enabled: true
-            existingClaim: storage
-            storageClass: ""
+            storageClass: longhorn
             size: 10Gi
 
         backend: { replicas: 0 }

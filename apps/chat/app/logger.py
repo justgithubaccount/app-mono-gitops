@@ -9,6 +9,7 @@ logging.basicConfig(stream=sys.stdout, format="%(message)s", level=logging.INFO)
 
 
 def add_trace_context(_, __, event_dict):
+    """Inject ``trace_id`` and ``span_id`` into ``event_dict`` if a span is active."""
     span = get_current_span()
     if span and span.get_span_context().trace_id != 0:
         ctx = span.get_span_context()
@@ -32,6 +33,12 @@ def with_context(**kwargs):
     return structlog.get_logger("chat").bind(**kwargs)
 
 
-def enrich_context(event: str, **kwargs):
+def enrich_context(event: str, **kwargs) -> dict:
+    """Return context with trace information for logging calls."""
     from .logger import with_context
-    return add_trace_context(None, None, with_context(event=event, **kwargs)._context)
+    return add_trace_context(
+        None,
+        None,
+        with_context(event=event, **kwargs)._context,
+    )
+

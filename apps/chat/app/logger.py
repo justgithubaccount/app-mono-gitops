@@ -32,6 +32,5 @@ def with_context(**kwargs):
 
 
 def enrich_context(event: str, **kwargs):
-    context = with_context(event=event, **kwargs)._context
-    context = add_trace_context(None, None, context)
-    return structlog.get_logger("chat").bind(**context)
+    """Return logger enriched with an event name and extra fields."""
+    return structlog.get_logger("chat").bind(event=event, **kwargs)

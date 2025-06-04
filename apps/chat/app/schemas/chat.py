@@ -31,13 +31,3 @@ class ChatRequest(BaseModel):
 class ChatResponse(BaseModel):
     reply: str = Field(..., example="Hello from AI")
 
-# ----------------------------------------
-# 📂 Память и проекты
-# ----------------------------------------
-
-class CreateProjectRequest(BaseModel):
-    name: str
-
-class ProjectInfo(BaseModel):
-    id: str
-    name: str

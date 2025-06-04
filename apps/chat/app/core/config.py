@@ -2,7 +2,7 @@ from pydantic_settings import BaseSettings
 from functools import lru_cache
 import os
 
-from app.logger import with_context
+from app.logger import enrich_context
 
 class Settings(BaseSettings):
     """
@@ -21,5 +21,5 @@ class Settings(BaseSettings):
 @lru_cache()
 def get_settings():
     settings = Settings()
-    with_context(event="config_loaded").info("Settings loaded")
+    enrich_context(event="config_loaded").info("Settings loaded")
     return settings

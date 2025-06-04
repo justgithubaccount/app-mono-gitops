@@ -1,11 +1,14 @@
 from fastapi import APIRouter, HTTPException, status, Depends
 from .schemas import (
-    ChatRequest, ChatResponse, Message, ChatMessage,
-    CreateProjectRequest, ProjectInfo, ChatHistory
+    ChatRequest, ChatResponse, Message,
+    CreateProjectRequest, ProjectInfo,
 )
+from .models import ChatHistory, StoredChatMessage
 from .services.chat_service import ChatService
 from .core.project_memory import ProjectMemory
-from app.logger import with_context
+from app.logger import enrich_context
+from opentelemetry import metrics
+from opentelemetry.trace import get_current_span
 import traceback
 
 api_router = APIRouter(
@@ -14,6 +17,8 @@ api_router = APIRouter(
 )
 
 memory = ProjectMemory()
+meter = metrics.get_meter(__name__)
+chat_counter = meter.create_counter("chat_requests_total")
 
 def get_chat_service():
     return ChatService()
@@ -23,16 +28,24 @@ async def chat_endpoint(
     req: ChatRequest,
     chat_service: ChatService = Depends(get_chat_service)
 ):
-    log = with_context(
+    log = enrich_context(
         event="chat_api_called",
         endpoint="/chat",
         user_message=req.messages[-1].content if req.messages else None
     )
 
     log.info("Received standard chat request")
+    chat_counter.add(1, {"project_id": "standalone"})
+    span = get_current_span()
+    trace_id = None
+    if span and span.get_span_context().trace_id != 0:
+        ctx = span.get_span_context()
+        trace_id = format(ctx.trace_id, "032x")
 
     try:
-        reply = await chat_service.get_ai_reply(req.messages, req.user_api_key)
+        reply = await chat_service.get_ai_reply(
+            req.messages, req.user_api_key, trace_id=trace_id
+        )
         return ChatResponse(reply=reply)
 
     except Exception as e:
@@ -43,7 +56,7 @@ async def chat_endpoint(
 @api_router.post("/projects", response_model=ProjectInfo)
 def create_project(req: CreateProjectRequest):
     project = memory.create_project(req.name)
-    with_context(
+    enrich_context(
         event="project_created",
         project_id=project.id,
         project_name=project.name
@@ -52,7 +65,7 @@ def create_project(req: CreateProjectRequest):
 
 @api_router.get("/projects", response_model=list[ProjectInfo])
 def list_projects():
-    with_context(event="project_list_requested").info("Project list requested")
+    enrich_context(event="project_list_requested").info("Project list requested")
     return memory.list_projects()
 
 @api_router.post("/projects/{project_id}/chat", response_model=ChatResponse)
@@ -61,7 +74,7 @@ async def chat_in_project(
     req: ChatRequest,
     chat_service: ChatService = Depends(get_chat_service)
 ):
-    log = with_context(
+    log = enrich_context(
         event="project_chat_called",
         endpoint=f"/projects/{project_id}/chat",
         project_id=project_id,
@@ -69,13 +82,25 @@ async def chat_in_project(
     )
 
     log.info("Chat within project requested")
+    chat_counter.add(1, {"project_id": project_id})
+
+    span = get_current_span()
+    trace_id = None
+    span_id = None
+    if span and span.get_span_context().trace_id != 0:
+        ctx = span.get_span_context()
+        trace_id = format(ctx.trace_id, "032x")
+        span_id = format(ctx.span_id, "016x")
 
     try:
-        chat_messages = [ChatMessage(role=m.role, content=m.content) for m in req.messages]
-        memory.add_chat(project_id, chat_messages)
+        chat_messages = [
+            StoredChatMessage(role=m.role, content=m.content)
+            for m in req.messages
+        ]
+        memory.add_chat(project_id, chat_messages, trace_id=trace_id, span_id=span_id)
 
         reply = await chat_service.get_ai_reply(
-            req.messages, req.user_api_key, project_id=project_id
+            req.messages, req.user_api_key, project_id=project_id, trace_id=trace_id
         )
         return ChatResponse(reply=reply)
 
@@ -90,7 +115,7 @@ async def chat_in_project(
 
 @api_router.get("/projects/{project_id}/history", response_model=list[ChatHistory])
 def get_project_history(project_id: str):
-    log = with_context(
+    log = enrich_context(
         event="project_history_requested",
         project_id=project_id
     )

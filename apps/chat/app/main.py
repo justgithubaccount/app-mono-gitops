@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from .api import api_router
 from .core.health import health_router
 from .observability.tracing import setup_tracing
-from .logger import with_context
+from .logger import enrich_context
 
 def create_app() -> FastAPI:
     app = FastAPI(
@@ -24,11 +24,11 @@ def create_app() -> FastAPI:
 
     # Настраиваем OpenTelemetry и логируем запуск
     setup_tracing(app)
-    with_context(event="startup").info("Application initialized")
+    enrich_context(event="startup").info("Application initialized")
 
     @app.get("/")
     async def root():
-        with_context(event="root_called").info("Root endpoint accessed")
+        enrich_context(event="root_called").info("Root endpoint accessed")
         return {
             "status": "ok",
             "service": app.title,

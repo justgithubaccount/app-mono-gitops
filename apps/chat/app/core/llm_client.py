@@ -1,17 +1,20 @@
 from typing import List, Optional
 from ..schemas import Message
 from ..core.config import get_settings
-from app.logger import with_context
+import structlog
+from app.logger import enrich_context
 import httpx
 import time
 
 class LLMClient:
     def __init__(self, settings=None):
         self.settings = settings or get_settings()
-        with_context(
-            event="llm_client_init",
-            model=self.settings.chat_model,
-            llm_api_url=self.settings.llm_api_url,
+        structlog.get_logger("chat").bind(
+            **enrich_context(
+                event="llm_client_init",
+                model=self.settings.chat_model,
+                llm_api_url=self.settings.llm_api_url,
+            )
         ).info("LLM client initialized")
 
     async def generate_reply(
@@ -23,11 +26,13 @@ class LLMClient:
     ) -> str:
         user_message = messages[-1].content if messages else ""
 
-        log = with_context(
-            project_id=project_id,
-            user_message=user_message,
-            model=self.settings.chat_model,
-            trace_id=trace_id,
+        log = structlog.get_logger("chat").bind(
+            **enrich_context(
+                project_id=project_id,
+                user_message=user_message,
+                model=self.settings.chat_model,
+                trace_id=trace_id,
+            )
         )
 
         log.bind(event="llm_request_sent").info("Sending request to LLM")

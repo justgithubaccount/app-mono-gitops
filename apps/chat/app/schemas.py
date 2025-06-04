@@ -2,7 +2,7 @@ from pydantic import BaseModel, Field
 from enum import Enum
 from typing import List, Optional
 from uuid import uuid4
-from datetime import datetime
+
 
 # ----------------------------------------
 # 📌 Роли сообщений
@@ -16,36 +16,35 @@ class Role(str, Enum):
 # 📌 Базовое сообщение
 # ----------------------------------------
 class Message(BaseModel):
-    role: Role
-    content: str
+    role: Role = Field(..., example="user")
+    content: str = Field(..., example="Hello")
 
 # ----------------------------------------
 # 📌 Структура запроса и ответа чата
 # ----------------------------------------
 class ChatRequest(BaseModel):
-    messages: List[Message]
-    user_api_key: Optional[str] = None
+    messages: List[Message] = Field(..., alias="messages", example=[{"role": "user", "content": "Hi"}])
+    user_api_key: Optional[str] = Field(
+        default=None,
+        alias="userApiKey",
+        example="sk-my-key"
+    )
+
+    class Config:
+        populate_by_name = True
 
 class ChatResponse(BaseModel):
-    reply: str
+    reply: str = Field(..., example="Hello, world")
 
 # ----------------------------------------
 # 📂 Память и проекты
 # ----------------------------------------
 
-class ChatMessage(BaseModel):
-    role: Role
-    content: str
 
-class ChatHistory(BaseModel):
-    id: str = Field(default_factory=lambda: str(uuid4()))
-    project_id: str
-    messages: List[ChatMessage]
-    timestamp: datetime = Field(default_factory=datetime.utcnow)
 
 class CreateProjectRequest(BaseModel):
-    name: str
+    name: str = Field(..., example="My Project")
 
 class ProjectInfo(BaseModel):
-    id: str = Field(default_factory=lambda: str(uuid4()))
-    name: str
+    id: str = Field(default_factory=lambda: str(uuid4()), example="123e4567-e89b-12d3-a456-426614174000")
+    name: str = Field(..., example="My Project")

@@ -2,6 +2,9 @@ from pydantic_settings import BaseSettings
 from functools import lru_cache
 import os
 
+import structlog
+from app.logger import enrich_context
+
 class Settings(BaseSettings):
     """
     Конфиг всего приложения.
@@ -18,4 +21,8 @@ class Settings(BaseSettings):
 
 @lru_cache()
 def get_settings():
-    return Settings()
+    settings = Settings()
+    structlog.get_logger("chat").bind(
+        **enrich_context(event="config_loaded")
+    ).info("Settings loaded")
+    return settings

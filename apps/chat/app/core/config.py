@@ -2,6 +2,8 @@ from pydantic_settings import BaseSettings
 from functools import lru_cache
 import os
 
+from app.logger import with_context
+
 class Settings(BaseSettings):
     """
     Конфиг всего приложения.
@@ -18,4 +20,6 @@ class Settings(BaseSettings):
 
 @lru_cache()
 def get_settings():
-    return Settings()
+    settings = Settings()
+    with_context(event="config_loaded").info("Settings loaded")
+    return settings

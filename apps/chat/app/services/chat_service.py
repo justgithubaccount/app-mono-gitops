@@ -12,6 +12,7 @@ class ChatService:
 
     def __init__(self, llm_client: LLMClient = None):
         self.llm_client = llm_client or LLMClient()
+        with_context(event="chat_service_init").info("Chat service initialized")
 
     async def get_ai_reply(
         self,

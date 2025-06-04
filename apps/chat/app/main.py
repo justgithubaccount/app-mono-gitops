@@ -28,6 +28,7 @@ def create_app() -> FastAPI:
 
     @app.get("/")
     async def root():
+        with_context(event="root_called").info("Root endpoint accessed")
         return {
             "status": "ok",
             "service": app.title,

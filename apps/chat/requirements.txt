@@ -4,7 +4,7 @@ uvicorn
 pydantic
 python-dotenv
 pydantic-settings
-python-json-logger
+structlog
 opentelemetry-api
 opentelemetry-sdk
 opentelemetry-instrumentation-fastapi

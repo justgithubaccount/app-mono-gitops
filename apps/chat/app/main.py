@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from .api import api_router
 from .core.health import health_router
 from .observability.tracing import setup_tracing
-from .logstritc import with_context
+from .logger import with_context
 
 def create_app() -> FastAPI:
     app = FastAPI(

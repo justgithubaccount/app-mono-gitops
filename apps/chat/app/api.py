@@ -5,7 +5,7 @@ from .schemas import (
 )
 from .services.chat_service import ChatService
 from .core.project_memory import ProjectMemory
-from app.logstritc import with_context
+from app.logger import with_context
 import traceback
 
 api_router = APIRouter(

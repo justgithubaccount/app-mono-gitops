@@ -1,7 +1,7 @@
 from typing import List, Optional
 from ..schemas import Message
 from ..core.config import get_settings
-from app.logstritc import with_context
+from app.logger import with_context
 import httpx
 import time
 

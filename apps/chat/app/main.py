@@ -2,6 +2,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from .api import api_router
 from .core.health import health_router
+from .observability.tracing import setup_tracing
+from .logstritc import with_context
 
 def create_app() -> FastAPI:
     app = FastAPI(
@@ -20,6 +22,10 @@ def create_app() -> FastAPI:
     app.include_router(api_router)
     app.include_router(health_router)
 
+    # Настраиваем OpenTelemetry и логируем запуск
+    setup_tracing(app)
+    with_context(event="startup").info("Application initialized")
+
     @app.get("/")
     async def root():
         return {
@@ -31,3 +37,7 @@ def create_app() -> FastAPI:
     return app
 
 app = create_app()
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)

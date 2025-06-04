@@ -3,7 +3,7 @@ import time
 
 from ..schemas import Message
 from ..core.llm_client import LLMClient
-from app.logger import with_context  # логгер с контекстом
+from app.logstritc import with_context  # логгер с контекстом
 
 class ChatService:
     """

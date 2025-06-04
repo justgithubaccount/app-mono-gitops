@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from app.logger import with_context
+from app.logger import enrich_context
 
 health_router = APIRouter(prefix="/health", tags=["health"])
 
@@ -9,5 +9,5 @@ async def health():
     """
     Healthcheck endpoint для мониторинга и Kubernetes/LB.
     """
-    with_context(event="health_check").info("Health check called")
+    enrich_context(event="health_check").info("Health check called")
     return {"status": "ok"}

@@ -3,7 +3,7 @@ import time
 
 from ..schemas import Message
 from ..core.llm_client import LLMClient
-from app.logger import with_context  # логгер с контекстом
+from app.logger import enrich_context  # логгер с контекстом
 
 class ChatService:
     """
@@ -12,7 +12,7 @@ class ChatService:
 
     def __init__(self, llm_client: LLMClient = None):
         self.llm_client = llm_client or LLMClient()
-        with_context(event="chat_service_init").info("Chat service initialized")
+        enrich_context(event="chat_service_init").info("Chat service initialized")
 
     async def get_ai_reply(
         self,
@@ -24,7 +24,7 @@ class ChatService:
         user_message = messages[-1].content if messages else ""
         model = getattr(self.llm_client, "model_name", "unknown")
 
-        log = with_context(
+        log = enrich_context(
             project_id=project_id,
             user_message=user_message,
             model=model,

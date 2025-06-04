@@ -1,14 +1,14 @@
 from typing import List, Optional
 from ..schemas import Message
 from ..core.config import get_settings
-from app.logger import with_context
+from app.logger import enrich_context
 import httpx
 import time
 
 class LLMClient:
     def __init__(self, settings=None):
         self.settings = settings or get_settings()
-        with_context(
+        enrich_context(
             event="llm_client_init",
             model=self.settings.chat_model,
             llm_api_url=self.settings.llm_api_url,
@@ -23,7 +23,7 @@ class LLMClient:
     ) -> str:
         user_message = messages[-1].content if messages else ""
 
-        log = with_context(
+        log = enrich_context(
             project_id=project_id,
             user_message=user_message,
             model=self.settings.chat_model,

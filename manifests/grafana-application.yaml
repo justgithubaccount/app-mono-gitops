@@ -13,7 +13,7 @@ spec:
       values: |
         adminPassword: admin
         service:
-          type: LoadBalancer
+          type: ClusterIP
         datasources:
           datasources.yaml:
             apiVersion: 1

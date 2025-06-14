@@ -13,6 +13,8 @@ class Settings(BaseSettings):
     llm_api_url: str = "http://localhost:4000"
     chat_model: str = "openai/gpt-4.1"
     project_name: str = "ChatMicroservice"
+    notion_token: str = os.getenv("NOTION_TOKEN", "")
+    notion_page_id: str = os.getenv("NOTION_PAGE_ID", "")
 
     class Config:
         env_file = ".env"

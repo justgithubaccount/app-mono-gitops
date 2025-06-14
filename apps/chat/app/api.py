@@ -1,9 +1,10 @@
-from fastapi import APIRouter, HTTPException, status, Depends
+from fastapi import APIRouter, HTTPException, status, Depends, Request
 from .schemas import (
     ChatRequest, ChatResponse, Message,
     CreateProjectRequest, ProjectInfo,
 )
 from .models import ChatHistory, StoredChatMessage
+from .integrations.behavior_manager import BehaviorManager
 from .services.chat_service import ChatService
 from .core.project_memory import ProjectMemory
 from app.logger import enrich_context
@@ -127,3 +128,11 @@ def get_project_history(project_id: str):
     except ValueError as e:
         log.bind(event="project_history_not_found").warning("Project not found when fetching history")
         raise HTTPException(status_code=404, detail=str(e))
+
+
+@api_router.get("/behavior/schema", summary="Get current behavior schema")
+async def get_behavior_schema(request: Request):
+    manager: BehaviorManager | None = getattr(request.app.state, "behavior_manager", None)
+    if not manager or not manager.behavior:
+        raise HTTPException(status_code=404, detail="Behavior not loaded")
+    return manager.behavior.model_dump()

@@ -1,11 +1,11 @@
 # 🧠 Bio AI Agents Infrastructure
 
 ## 📄 Содержание
-- [🧠 Архитектура классов chat-api](readme/chata-api-classes.md)
-- [⚙️ Использование OpenTelemetry](readme/open-telemetry.md)
-- [🤖 Определения CrewAI и поведение агентов](readme/crewai-definition.md)
-- [📜 Общий обзор CrewAI](readme/crewai-general.md)
-- [🛠️ Примеры задач для Codex](readme/codex-task-example.md)
+- 🧠 [Архитектура классов chat-api](readme/chat-api-classes.md)
+- ⚙️ [Использование OpenTelemetry](readme/open-telemetry.md)
+- 🤖 [Определения CrewAI и поведение агентов](readme/crewai-definition.md)
+- 📜 [Общий обзор CrewAI](readme/crewai-general.md)
+- 🛠️ [Примеры задач для Codex](readme/codex-task-example.md)
 
 Полный обзор микросервиса для работы с LLM (GPT-4 и др.), построенного на FastAPI, с CrewAI-интеграцией, observability-стеком, GitOps-деплоем и тестируемым CI/CD пайплайном.
 

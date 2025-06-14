@@ -137,6 +137,7 @@ kubectl logs -n ingress-nginx -l app.kubernetes.io/name=ingress-nginx | tail -n 
 * Все изменения только через Git → CI → ArgoCD (никаких ручных `kubectl apply`).
 * Для новых секретов всегда использовать SealedSecret.
 * В случае изменений переменных окружения или конфига — просто коммит в git и Argo всё подтянет.
+* Для управления поведением агента через Notion задайте `NOTION_TOKEN` и `NOTION_PAGE_ID` в переменных окружения.
 * Для отладки — использовать логи pod-ов, а не "залезание внутрь".
 
 ---

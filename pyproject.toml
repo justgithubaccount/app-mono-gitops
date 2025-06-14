@@ -20,7 +20,9 @@ dependencies = [
   "structlog",
   "opentelemetry-api",
   "opentelemetry-sdk",
-  "opentelemetry-instrumentation-fastapi"
+    "opentelemetry-instrumentation-fastapi"
+    ,"PyYAML"
+    ,"notion-client"
 ]
 
 [project.urls]

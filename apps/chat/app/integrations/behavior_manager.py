@@ -1,5 +1,8 @@
 import yaml
+from pydantic import ValidationError
+
 from app.logger import enrich_context
+from app.behavior import BehaviorDefinition
 
 class BehaviorManager:
     """Loads and stores agent behavior from Notion."""
@@ -7,7 +10,7 @@ class BehaviorManager:
     def __init__(self, notion_client, page_id: str):
         self.notion_client = notion_client
         self.page_id = page_id
-        self.behavior = {}
+        self.behavior: BehaviorDefinition | None = None
 
     async def refresh(self) -> None:
         log = enrich_context(event="behavior_refresh", page_id=self.page_id)
@@ -19,10 +22,15 @@ class BehaviorManager:
                 if block.get("type") == "code":
                     text = block["code"].get("rich_text", [])
                     content = "".join(t.get("plain_text", "") for t in text)
-                    self.behavior = yaml.safe_load(content) or {}
+                    raw = yaml.safe_load(content) or {}
+                    self.behavior = BehaviorDefinition.model_validate(raw)
+                    log.bind(event="behavior_parsed").debug(self.behavior.model_dump())
                     log.bind(event="behavior_loaded").info("Behavior updated")
                     return
             log.bind(event="behavior_not_found").warning("No YAML code block found")
+        except ValidationError as e:
+            log.bind(event="behavior_validation_error", errors=e.errors()).error("Behavior validation failed")
+            raise
         except Exception as e:
             log.bind(event="behavior_parse_error", error=str(e)).error("Failed to parse behavior")
             raise

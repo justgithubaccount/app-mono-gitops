@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+
 from .api import api_router
 from .core.health import health_router
 from .observability.tracing import setup_tracing
@@ -7,6 +8,9 @@ from .logger import enrich_context
 from .core.config import get_settings
 from .integrations.notion_client import NotionClient
 from .integrations.behavior_manager import BehaviorManager
+
+from crewai import Crew
+import os
 
 def create_app() -> FastAPI:
     app = FastAPI(
@@ -25,7 +29,16 @@ def create_app() -> FastAPI:
         async def load_behavior():
             await behavior_manager.refresh()
 
-    # CORS: на проде настрой через ENV/config
+    # CrewAI YAML
+    @app.on_event("startup")
+    async def load_crew():
+        yaml_path = os.path.join(os.path.dirname(__file__), "infra_cluster.yaml")
+        if os.path.exists(yaml_path):
+            app.state.crew = Crew.load(yaml_path)
+            enrich_context(event="crew_loaded", file=yaml_path).info("Crew loaded from YAML")
+            # app.state.crew.kickoff()  # автостарт агентов
+
+    # CORS
     app.add_middleware(
         CORSMiddleware,
         allow_origins=["*"],
@@ -33,11 +46,12 @@ def create_app() -> FastAPI:
         allow_methods=["*"],
         allow_headers=["*"],
     )
-    # Внешние роутеры (можно делегировать)
+
+    # Роуты
     app.include_router(api_router)
     app.include_router(health_router)
 
-    # Настраиваем OpenTelemetry и логируем запуск
+    # Трейсинг и лог старта
     setup_tracing(app)
     enrich_context(event="startup").info("Application initialized")
 
@@ -51,6 +65,7 @@ def create_app() -> FastAPI:
         }
 
     return app
+
 
 app = create_app()
 

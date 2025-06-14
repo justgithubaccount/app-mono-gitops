@@ -12,6 +12,7 @@ authors = [
 
 dependencies = [
   "fastapi",
+  "crewai",
   "httpx",
   "uvicorn",
   "pydantic",

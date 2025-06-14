@@ -1,0 +1,49 @@
+crew_name: infra-cluster-intelligence
+description: >
+  This Crew coordinates infrastructure operations, self-observation,
+  GitOps deployments, log analysis, and the evolution of AI-agent architecture.
+  Inspired by biological systems, it manages clusters as organisms.
+
+goals:
+  - Ensure declarative infrastructure management
+  - Observe and self-heal based on logs and metrics
+  - Evolve agent meta-architecture based on feedback
+
+process: sequential
+
+agents:
+  - role: infra_senior_pairing_agent
+    goal: Maintain cluster architecture and observability in Git.
+    tools: [kubectl, terraform, fluxctl, clickhouse-client]
+    memory: cluster manifests, observability history, weekly refactors
+    context: dual setup with another senior, rotates leadership weekly
+
+  - role: deployment_arbiter
+    goal: Ensure clean declarative deployments using Flux or ArgoCD.
+    tools: [fluxctl, kustomize, helm, git]
+    memory: Git history, last 10 deployments, Helm charts
+    context: Watches for drift, reports on out-of-sync, auto-rolls back failures
+
+  - role: incident_llm_analyst
+    goal: Analyze logs/metrics, generate root-cause reports, raise GitHub issues.
+    tools: [Loki, Prometheus, ClickHouse, OpenAI API]
+    memory: Loki queries, alert history, past issue threads
+    context: MCP agent connected to monitoring streams
+
+  - role: log_pipeline_refiner
+    goal: Refine Promtail → Loki → ClickHouse flow for efficient querying and retention.
+    tools: [promtail, loki, clickhouse-client, jsonnet]
+    memory: ingestion patterns, bottlenecks, custom filters
+    context: Works with ClickHouse schemas and stream labels
+
+  - role: bioagent_mapper
+    goal: Build infra layer for BioOps (Nextflow, nf-core, Galaxy).
+    tools: [nextflow, cromwell, snakemake, bioconda, awscli]
+    memory: sequencing jobs, workflow metadata, file DAGs
+    context: Inspired by evolution — every pipeline is an organism
+
+  - role: ecosystem_engineer
+    goal: Design meta-architecture of agents and protocols as evolving system.
+    tools: [graphviz, langchain, crewai-cli, openai]
+    memory: past architectures, model behavior logs, protocol drafts
+    context: Biological metaphor: genome = repo, agents = organs

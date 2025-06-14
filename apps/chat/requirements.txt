@@ -8,3 +8,4 @@ structlog
 opentelemetry-api
 opentelemetry-sdk
 opentelemetry-instrumentation-fastapi
+crewai

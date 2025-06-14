@@ -2,9 +2,9 @@
 name = "app-release"
 version = "0.1.0"
 description = "AI Chat microservice with FastAPI"
-readme = "README.md"
+readme = "README.v2.md"
 requires-python = ">=3.10"
-license = {text = "MIT"}
+license = "MIT"
 
 authors = [
   {name = "Jenya", email = "kulikovyevgeny@outlook.com"}
@@ -21,9 +21,16 @@ dependencies = [
   "structlog",
   "opentelemetry-api",
   "opentelemetry-sdk",
-    "opentelemetry-instrumentation-fastapi"
-    ,"PyYAML"
-    ,"notion-client"
+  "opentelemetry-instrumentation-fastapi",
+  "PyYAML",
+  "notion-client"
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest",
+  "httpx",
+  "pytest-asyncio"
 ]
 
 [project.urls]
@@ -31,5 +38,5 @@ dependencies = [
 "Documentation" = "http://localhost:8000/docs"
 "Source" = "https://github.com/justgithubaccount/app-release"
 
-[tool.uv]
-python = "3.10"
+[tool.setuptools]
+packages = ["apps.chat.app"]

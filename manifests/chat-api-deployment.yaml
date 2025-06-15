@@ -15,13 +15,13 @@ spec:
       labels:
         app: chat-api
     spec:
-      topologySpreadConstraints:
-        - maxSkew: 1
-          topologyKey: kubernetes.io/hostname
-          whenUnsatisfiable: ScheduleAnyway
-          labelSelector:
-            matchLabels:
-              app: chat-api
+      # topologySpreadConstraints:
+      #   - maxSkew: 1
+      #     topologyKey: kubernetes.io/hostname
+      #     whenUnsatisfiable: ScheduleAnyway
+      #     labelSelector:
+      #       matchLabels:
+      #         app: chat-api
       volumes:
         - name: logs
           emptyDir: {}

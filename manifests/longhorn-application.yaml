@@ -4,18 +4,17 @@ metadata:
   name: longhorn
   namespace: argocd
 spec:
-  destination:
-    namespace: longhorn-system
-    server: https://kubernetes.default.svc
-  project: default
   source:
-    chart: longhorn
     repoURL: https://charts.longhorn.io
+    chart: longhorn
     targetRevision: 1.9.0
     helm:
       values: |
         preUpgradeChecker:
           enabled: false
+  destination:
+    namespace: longhorn-system
+    server: https://kubernetes.default.svc
   syncPolicy:
     automated:
       prune: true

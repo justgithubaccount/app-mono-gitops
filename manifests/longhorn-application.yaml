@@ -12,6 +12,10 @@ spec:
     chart: longhorn
     repoURL: https://charts.longhorn.io
     targetRevision: 1.9.0
+    helm:
+      values: |
+        preUpgradeChecker:
+          enabled: false
   syncPolicy:
     automated:
       prune: true

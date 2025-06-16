@@ -7,7 +7,9 @@ data:
   vector.toml: |
     [sources.otel]
     type = "opentelemetry"
-    http.endpoint = "0.0.0.0:4318"
+
+    [sources.otel.http]
+    address = "0.0.0.0:4318"
 
     [sinks.loki]
     type = "loki"
@@ -16,4 +18,3 @@ data:
     encoding.codec = "json"
     labels.app = "chat-api"
     labels.env = "public"
-

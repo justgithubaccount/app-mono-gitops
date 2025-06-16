@@ -10,7 +10,7 @@ def setup_tracing(app) -> None:
     provider = TracerProvider(resource=resource)
 
     otlp_exporter = OTLPSpanExporter(
-        endpoint="http://localhost:4318/v1/traces",
+        endpoint="http://localhost:4318",
         # insecure=True,
     )
     processor = BatchSpanProcessor(otlp_exporter)

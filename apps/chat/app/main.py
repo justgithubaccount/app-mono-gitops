@@ -49,7 +49,7 @@ def create_app() -> FastAPI:
 
     # Роуты
     app.include_router(api_router)
-    app.include_router(health_router)
+    # app.include_router(health_router)
 
     # Трейсинг и лог старта
     setup_tracing(app)

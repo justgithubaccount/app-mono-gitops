@@ -6,6 +6,7 @@ from .core.health import health_router
 from .observability.tracing import setup_tracing
 from .logger import enrich_context
 from .core.config import get_settings
+from .core.db import init_db
 from .integrations.notion_client import NotionClient
 from .integrations.behavior_manager import BehaviorManager
 
@@ -19,6 +20,10 @@ def create_app() -> FastAPI:
     )
 
     settings = get_settings()
+
+    @app.on_event("startup")
+    def _init_db() -> None:
+        init_db()
 
     if settings.notion_token and settings.notion_page_id:
         notion_client = NotionClient(settings.notion_token)

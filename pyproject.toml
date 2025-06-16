@@ -23,14 +23,17 @@ dependencies = [
   "opentelemetry-sdk",
   "opentelemetry-instrumentation-fastapi",
   "PyYAML",
-  "notion-client"
+  "notion-client",
+  "sqlmodel",
+  "psycopg2-binary"
 ]
 
 [project.optional-dependencies]
 dev = [
   "pytest",
   "httpx",
-  "pytest-asyncio"
+  "pytest-asyncio",
+  "alembic"
 ]
 
 [project.urls]

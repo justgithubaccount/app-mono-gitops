@@ -25,6 +25,7 @@ class ChatService:
         model = getattr(self.llm_client, "model_name", "unknown")
 
         log = enrich_context(
+            event="llm_request",
             project_id=project_id,
             user_message=user_message,
             model=model,

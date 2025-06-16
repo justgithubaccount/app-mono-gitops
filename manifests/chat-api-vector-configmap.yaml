@@ -11,6 +11,9 @@ data:
     [sources.otel.http]
     address = "0.0.0.0:4318"
 
+    [sources.otel.grpc]
+    address = "0.0.0.0:4317"
+
     [sinks.loki]
     type = "loki"
     inputs = ["otel"]

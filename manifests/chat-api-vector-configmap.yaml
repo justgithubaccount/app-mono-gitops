@@ -7,7 +7,7 @@ data:
   vector.toml: |
     [sources.otel]
     type = "opentelemetry"
-    address = "0.0.0.0:4318"
+    http.endpoint = "0.0.0.0:4318"
 
     [sinks.loki]
     type = "loki"

@@ -16,7 +16,7 @@ data:
 
     [sinks.loki]
     type = "loki"
-    inputs = ["otel"]
+    inputs = ["otel.logs"]
     endpoint = "http://loki.observability.svc.cluster.local:3100"
     encoding.codec = "json"
     labels.app = "chat-api"

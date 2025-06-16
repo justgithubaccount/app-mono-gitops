@@ -5,21 +5,22 @@ metadata:
   namespace: chat-api
 data:
   vector.toml: |
-    [sources.file_logs]
-    type = "file"
-    include = ["/var/log/chat/*.log"]
-
-    [transforms.parse]
-    type = "remap"
-    inputs = ["file_logs"]
-    source = '''
-    . = parse_json!(.message)
-    '''
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: chat-api-vector-config
+  namespace: chat-api
+data:
+  vector.toml: |
+    [sources.otel]
+    type = "opentelemetry"
+    address = "0.0.0.0:4318"
 
     [sinks.loki]
     type = "loki"
-    inputs = ["parse"]
+    inputs = ["otel"]
     endpoint = "http://loki.observability.svc.cluster.local:3100"
     encoding.codec = "json"
     labels.app = "chat-api"
     labels.env = "public"
+

@@ -4,8 +4,9 @@ import sys
 import structlog
 from opentelemetry.trace import get_current_span
 
-
-logging.basicConfig(stream=sys.stdout, format="%(message)s", level=logging.INFO)
+logging.basicConfig(
+    format="%(message)s", stream=sys.stdout, level=logging.INFO
+)
 
 def add_trace_context(_, __, event_dict):
     span = get_current_span()
@@ -25,12 +26,5 @@ structlog.configure(
     logger_factory=structlog.stdlib.LoggerFactory(),
 )
 
-
-def with_context(**kwargs):
-    """Return a logger pre-bound with contextual information."""
-    return structlog.get_logger("chat").bind(**kwargs)
-
-
 def enrich_context(event: str, **kwargs):
-    """Return logger enriched with an event name and extra fields."""
     return structlog.get_logger("chat").bind(event=event, **kwargs)

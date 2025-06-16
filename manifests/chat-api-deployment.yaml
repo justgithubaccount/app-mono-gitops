@@ -33,6 +33,17 @@ spec:
           image: ghcr.io/justgithubaccount/chat-api:latest
           ports:
             - containerPort: 8000
+          env:
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: http://localhost:4318
+            - name: OTEL_EXPORTER_OTLP_PROTOCOL
+              value: http/protobuf
+            - name: OTEL_TRACES_EXPORTER
+              value: otlp
+            - name: OTEL_LOGS_EXPORTER
+              value: otlp
+            - name: OTEL_SERVICE_NAME
+              value: chat-api
           envFrom:
             - secretRef:
                 name: chat-api-secrets
@@ -53,9 +64,7 @@ spec:
               mountPath: /var/log/chat
           command: ["/bin/sh", "-c"]
           args:
-            - |
-              uvicorn app.main:app --host 0.0.0.0 --port 8000 \
-              | tee /var/log/chat/app.log
+            - uvicorn app.main:app --host 0.0.0.0 --port 8000
 
           # resources:
           #   requests:

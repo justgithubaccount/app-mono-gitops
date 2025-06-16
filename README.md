@@ -108,6 +108,18 @@ make test  # pytest
 make run   # запускает FastAPI
 ```
 
+### Работа с БД и миграции
+
+Используется SQLModel и PostgreSQL. URL подключения задаётся переменной `DATABASE_URL` (по умолчанию SQLite `sqlite:///db.sqlite3`).
+
+Инициализация и миграции через Alembic:
+
+```bash
+alembic init alembic      # однократная инициализация
+alembic revision --autogenerate -m "init"
+alembic upgrade head
+```
+
 ### Makefile (доступные команды):
 
 ```bash

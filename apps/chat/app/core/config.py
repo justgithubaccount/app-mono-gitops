@@ -15,6 +15,7 @@ class Settings(BaseSettings):
     project_name: str = "ChatMicroservice"
     notion_token: str = os.getenv("NOTION_TOKEN", "")
     notion_page_id: str = os.getenv("NOTION_PAGE_ID", "")
+    database_url: str = os.getenv("DATABASE_URL", "sqlite:///db.sqlite3")
 
     class Config:
         env_file = ".env"

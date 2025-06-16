@@ -24,6 +24,7 @@ class LLMClient:
         user_message = messages[-1].content if messages else ""
 
         log = enrich_context(
+            event="llm_generate_reply",
             project_id=project_id,
             user_message=user_message,
             model=self.settings.chat_model,

@@ -47,6 +47,8 @@ spec:
           envFrom:
             - secretRef:
                 name: chat-api-secrets
+            - secretRef:
+                name: chat-api-db
           readinessProbe:
             httpGet:
               path: /health

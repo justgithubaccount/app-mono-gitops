@@ -14,7 +14,7 @@ spec:
   source:
     repoURL: 'https://github.com/justgithubaccount/app-release.git'
     targetRevision: main
-    path: manifests
+    path: chat
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: chat-api

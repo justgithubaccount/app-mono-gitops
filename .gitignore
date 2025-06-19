@@ -16,3 +16,5 @@ litellm-secrets.yaml
 loki-secrets.yaml
 pg-secrets.yaml
 .env.litellm
+secret-cloudflare-external-dns.yaml
+secret-cloudflare-cert-manager.yaml

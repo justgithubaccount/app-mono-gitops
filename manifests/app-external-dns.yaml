@@ -18,7 +18,7 @@ spec:
           - syncjob.ru
         policy: upsert-only
         logLevel: debug
-        extraEnvVars:
+        env:
           - name: CF_API_TOKEN
             valueFrom:
               secretKeyRef:

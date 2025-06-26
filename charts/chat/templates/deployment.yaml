@@ -1,0 +1,74 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "chat-api.fullname" . }}
+  namespace: {{ .Values.namespace | default "chat-api" }}
+  labels:
+    app: {{ include "chat-api.name" . }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ include "chat-api.name" . }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "chat-api.name" . }}
+    spec:
+      volumes:
+        - name: logs
+          emptyDir: {}
+        - name: vector-config
+          configMap:
+            name: {{ .Values.vectorConfigMapName | default "chat-api-vector-config" }}
+      containers:
+        - name: chat-api
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.containerPort }}
+          env:
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: {{ .Values.env.OTEL_EXPORTER_OTLP_ENDPOINT | quote }}
+            - name: OTEL_EXPORTER_OTLP_PROTOCOL
+              value: {{ .Values.env.OTEL_EXPORTER_OTLP_PROTOCOL | quote }}
+            - name: OTEL_TRACES_EXPORTER
+              value: {{ .Values.env.OTEL_TRACES_EXPORTER | quote }}
+            - name: OTEL_LOGS_EXPORTER
+              value: {{ .Values.env.OTEL_LOGS_EXPORTER | quote }}
+            - name: OTEL_SERVICE_NAME
+              value: {{ .Values.env.OTEL_SERVICE_NAME | quote }}
+          envFrom:
+            - secretRef:
+                name: {{ .Values.secretsRefName | default "chat-api-secrets" }}
+            {{- if .Values.dbSecretRefName }}
+            - secretRef:
+                name: {{ .Values.dbSecretRefName }}
+            {{- end }}
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: {{ .Values.containerPort }}
+            initialDelaySeconds: 2
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: {{ .Values.containerPort }}
+            initialDelaySeconds: 2
+            periodSeconds: 10
+          volumeMounts:
+            - name: logs
+              mountPath: /var/log/chat
+          command: ["/bin/sh", "-c"]
+          args:
+            - uvicorn app.main:app --host 0.0.0.0 --port {{ .Values.containerPort }}
+        - name: vector
+          image: {{ .Values.vector.image }}
+          command: ["/usr/bin/vector"]
+          args: ["--config", "/etc/vector/vector.toml"]
+          volumeMounts:
+            - name: logs
+              mountPath: /var/log/chat
+            - name: vector-config
+              mountPath: /etc/vector

@@ -1,0 +1,54 @@
+# --- Базовые параметры деплоймента (инфраструктурные) ---
+replicaCount: 2                  # Количество реплик пода (Deployment.spec.replicas)
+namespace: chat-api              # Namespace, в котором будет развернут сервис
+
+# --- Docker-образ (настройки контейнера) ---
+image:
+  repository: ghcr.io/justgithubaccount/chat-api   # Имя репозитория образа
+  tag: latest                                      # Тег образа (можно подменять на prod/stage)
+  pullPolicy: IfNotPresent                         # pullPolicy (обычно IfNotPresent или Always)
+
+containerPort: 8000                                # Порт, на котором приложение слушает внутри контейнера
+
+# --- Service (Kubernetes Service) ---
+service:
+  type: ClusterIP                                  # Тип сервис (ClusterIP, NodePort, LoadBalancer)
+  port: 80                                         # Внешний порт сервиса (доступен внутри кластера)
+
+# --- Конфиг Vector (для логгирования, observability) ---
+vectorConfigMapName: chat-api-vector-config        # Имя ConfigMap с конфигом Vector
+
+# --- Secrets (имена Secret'ов для передачи в контейнеры) ---
+secretsRefName: chat-api-secrets                   # Основной Secret с чувствительными переменными
+dbSecretRefName: chat-api-db                       # Secret с параметрами доступа к БД
+
+# --- Окружение (env) для приложения ---
+env:
+  OTEL_EXPORTER_OTLP_ENDPOINT: "http://localhost:4318"
+  OTEL_EXPORTER_OTLP_PROTOCOL: "http/protobuf"
+  OTEL_TRACES_EXPORTER: otlp
+  OTEL_LOGS_EXPORTER: otlp
+  OTEL_SERVICE_NAME: chat-api
+
+# --- Настройки sidecar Vector (логгирование и мониторинг) ---
+vector:
+  image: timberio/vector:0.47.X-debian             # Образ Vector
+  lokiEndpoint: "http://loki.observability.svc.cluster.local:3100"  # Loki endpoint для логов
+  env: "public"                                    # Переменная окружения (например, prod/stage/public)
+
+# --- Ingress (экспонирование наружу, балансировка, TLS) ---
+ingress:
+  enabled: true                                    # Включить/выключить Ingress
+  className: nginx                                 # Класс контроллера (nginx, traefik и др)
+  host: chatapi.example.com                        # DNS-имя, по которому будет доступен сервис
+  path: /                                          # Базовый path
+  tls: false                                       # Включить TLS (true/false)
+  tlsSecretName: ""                                # Имя Secret'а для TLS-серта, если включён
+  annotations: {}                                  # Дополнительные аннотации Ingress (rate limit, rewrite, etc.)
+
+# --- Секретные переменные для контейнера (заполняются через secretsRefName) ---
+secrets:
+  openaiApiKey: "sk-..."                           # Ключ OpenAI API (ВАЖНО: не хранить в публичных репах!)
+  llmApiUrl: "http://litellm:4000"                 # URL LLM API (например, локальный или внешний сервис)
+  chatModel: "openai/gpt-4.1"                      # Модель LLM
+  projectName: "ChatMicroservice"                  # Название проекта/приложения (для тегирования, мониторинга и т.п.)

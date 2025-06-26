@@ -1,0 +1,70 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: litellm
+  namespace: chat-api
+  labels:
+    app: litellm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: litellm
+  template:
+    metadata:
+      labels:
+        app: litellm
+    spec:
+      volumes:
+        - name: config
+          configMap:
+            name: litellm-config
+        - name: logs
+          emptyDir: {}
+        - name: vector-config
+          configMap:
+            name: litellm-vector-config
+      containers:
+        - name: litellm
+          image: ghcr.io/berriai/litellm:main-latest
+          ports:
+            - containerPort: 4000
+          envFrom:
+            - secretRef:
+                name: litellm-secrets
+          volumeMounts:
+            - name: config
+              mountPath: /app/config.yaml
+              subPath: config.yaml
+            - name: logs
+              mountPath: /var/log/litellm
+          command: ["/bin/sh", "-c"]
+          args:
+            - "litellm --config /app/config.yaml > /var/log/litellm/app.log 2>&1"
+          # resources:
+          #   requests:
+          #     cpu: 100m
+          #     memory: 128Mi
+          #   limits:
+          #     cpu: 300m
+          #     memory: 256Mi
+
+        - name: vector
+          image: timberio/vector:0.47.X-debian
+          command: ["/usr/bin/vector"]
+          args: ["--config", "/etc/vector/vector.toml"]
+          ports:
+            - containerPort: 4317
+              name: otlp-grpc
+          volumeMounts:
+            - name: logs
+              mountPath: /var/log/litellm
+            - name: vector-config
+              mountPath: /etc/vector
+          # resources:
+          #   requests:
+          #     cpu: 50m
+          #     memory: 64Mi
+          #   limits:
+          #     cpu: 150m
+          #     memory: 128Mi

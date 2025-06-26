@@ -1,0 +1,12 @@
+# apiVersion: v1
+# kind: PersistentVolumeClaim
+# metadata:
+#   name: storage
+#   namespace: observability
+# spec:
+#   volumeName: loki-pv
+#   accessModes:
+#     - ReadWriteOnce
+#   resources:
+#     requests:
+#       storage: 10Gi

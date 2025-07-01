@@ -1,5 +1,5 @@
 apiVersion: v2
-name: chat
+name: chat-api
 description: ai-app (mind)
 type: application
 version: 0.1.0

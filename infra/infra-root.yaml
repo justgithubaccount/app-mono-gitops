@@ -9,7 +9,7 @@ spec:
     repoURL: https://github.com/justgithubaccount/app-release.git
     path: infra/services
     directory:
-      recurse: false
+      recurse: true
   destination:
     server: https://kubernetes.default.svc
     namespace: argocd

@@ -1,13 +1,13 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: infra-root
+  name: addons
   namespace: argocd
 spec:
   project: default
   source:
     repoURL: https://github.com/justgithubaccount/app-release.git
-    path: infra/_main_apps
+    path: infra/addons
     directory:
       recurse: true
   destination:
@@ -15,7 +15,7 @@ spec:
     namespace: argocd
   syncPolicy:
     automated:
-      prune: true
       selfHeal: true
+      prune: true
     syncOptions:
       - CreateNamespace=true

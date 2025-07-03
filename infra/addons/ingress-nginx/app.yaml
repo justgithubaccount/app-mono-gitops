@@ -19,6 +19,8 @@
               default: true
             metrics:
               enabled: true
+            admissionWebhooks:
+              enabled: true
     destination:
       server: https://kubernetes.default.svc
       namespace: ingress-nginx

@@ -7,7 +7,7 @@ spec:
   project: default
   source:
     repoURL: https://github.com/justgithubaccount/app-release.git
-    path: infra/_main_apps
+    path: infra/services
     directory:
       recurse: false
   destination:

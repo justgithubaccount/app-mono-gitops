@@ -5,6 +5,9 @@ metadata:
   namespace: argocd
 spec:
   project: default
+  destination:
+    name: CLUSTER  # ← Placeholder
+    namespace: cert-manager
   source:
     repoURL: https://charts.jetstack.io
     chart: cert-manager
@@ -15,9 +18,6 @@ spec:
         extraArgs:
           - --dns01-recursive-nameservers-only
           - --dns01-recursive-nameservers=8.8.8.8:53,1.1.1.1:53
-  destination:
-    server: https://kubernetes.default.svc
-    namespace: cert-manager
   syncPolicy:
     automated:
       prune: true

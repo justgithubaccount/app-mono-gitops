@@ -1,18 +1,21 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: addons
+  name: chat-api
   namespace: argocd
 spec:
   project: default
   source:
-    repoURL: https://github.com/justgithubaccount/app-release.git
-    path: infra/addons
-    directory:
-      recurse: true
+    repoURL: https://github.com/justgithubaccount/app-release
+    targetRevision: main
+    path: charts/chat
+    helm:
+      values: |
+        image:
+          tag: latest
   destination:
-    server: https://kubernetes.default.svc
-    namespace: argocd
+    server: CLUSTER
+    namespace: chat-api
   syncPolicy:
     automated:
       selfHeal: true

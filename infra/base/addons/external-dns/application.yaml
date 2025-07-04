@@ -5,6 +5,9 @@ metadata:
   namespace: argocd
 spec:
   project: default
+  destination:
+    name: CLUSTER  # ← Placeholder
+    namespace: external-dns
   source:
     repoURL: https://kubernetes-sigs.github.io/external-dns/
     chart: external-dns
@@ -24,9 +27,6 @@ spec:
               secretKeyRef:
                 name: cloudflare-api-token
                 key: api-token
-  destination:
-    server: https://kubernetes.default.svc
-    namespace: external-dns
   syncPolicy:
     automated:
       selfHeal: true

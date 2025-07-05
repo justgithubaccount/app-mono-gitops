@@ -13,14 +13,24 @@ resources:
   - ../../../base/services/agent/chat
   - ../../../base/services/llm/gateway
 
+# patches:
+#   # Исправляем CLUSTER placeholder для всех Applications
+#   - target:
+#       kind: Application
+#     patch: |-
+#       - op: replace
+#         path: /spec/destination/name
+#         value: prd
+#       - op: replace  
+#         path: /spec/destination/server
+#         value: https://kubernetes.default.svc
+
 patches:
-  # Исправляем CLUSTER placeholder для всех Applications
   - target:
       kind: Application
     patch: |-
-      - op: replace
+      - op: remove
         path: /spec/destination/name
-        value: prd
-      - op: replace  
+      - op: replace
         path: /spec/destination/server
         value: https://kubernetes.default.svc

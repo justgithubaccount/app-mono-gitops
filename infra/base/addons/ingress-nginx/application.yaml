@@ -3,6 +3,8 @@ kind: Application
 metadata:
   name: ingress-nginx
   namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"  # Устанавливается первым
 spec:
   project: default
   destination:
@@ -24,9 +26,12 @@ spec:
             enabled: true
           admissionWebhooks:
             enabled: true
+            timeoutSeconds: 30  # Увеличиваем timeout
+            failurePolicy: Ignore
   syncPolicy:
     automated:
       selfHeal: true
       prune: true
     syncOptions:
       - CreateNamespace=true
+      - Replace=true  # Для пересоздания проблемных ресурсов

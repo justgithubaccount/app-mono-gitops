@@ -3,6 +3,9 @@ kind: Ingress
 metadata:
   name: grafana
   namespace: observability
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 spec:
   ingressClassName: nginx
   rules:

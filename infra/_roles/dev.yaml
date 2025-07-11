@@ -9,7 +9,7 @@ metadata:
     - resources-finalizer.argocd.argoproj.io
 spec:
   destination:
-    name: dev                                # <= имя dev-кластера в Argo CD
+    server: https://kubernetes.default.svc
     namespace: argocd
   project: default
   source:

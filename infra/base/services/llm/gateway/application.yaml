@@ -1,0 +1,18 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: llm-gateway
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/your-repo/app-release
+    targetRevision: HEAD
+    path: infra/base/services/llm/gateway
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: chat-api
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

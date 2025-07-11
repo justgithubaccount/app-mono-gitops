@@ -16,8 +16,8 @@ spec:
         image:
           tag: latest
   destination:
-    # server: CLUSTER
-    server: https://kubernetes.default.svc
+    server: CLUSTER
+    # server: https://kubernetes.default.svc
     namespace: chat-api
   syncPolicy:
     automated:

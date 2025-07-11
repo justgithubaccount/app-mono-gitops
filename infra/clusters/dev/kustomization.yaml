@@ -4,13 +4,13 @@ kind: Kustomization
 namePrefix: dev-
 
 resources:
-  - ../../../base/addons/ingress-nginx
-  - ../../../base/addons/cert-manager
-  - ../../../base/addons/external-dns
-  - ../../../base/addons/observability/loki
-  - ../../../base/addons/observability/grafana
-  - ../../../base/services/agent/chat
-  - ../../../base/services/llm/gateway
+  - ../../base/addons/ingress-nginx
+  - ../../base/addons/cert-manager
+  - ../../base/addons/external-dns
+  - ../../base/addons/observability/loki
+  - ../../base/addons/observability/grafana
+  - ../../base/services/agent/chat
+  - ../../base/services/llm/gateway
 
 # patches:
 #   # Исправляем CLUSTER placeholder для всех Applications

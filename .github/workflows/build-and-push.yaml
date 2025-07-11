@@ -1,6 +1,11 @@
+name: Build and Push
+
 on:
   push:
     branches: [ main ]
+    paths: 
+      - 'apps/chat/**'                           # ← Билдить только при изменениях в chat
+      - '.github/workflows/build-and-push.yaml'  # ← И при изменениях workflow
 
 jobs:
   build-and-push:
@@ -8,21 +13,22 @@ jobs:
     permissions:
       contents: read
       packages: write
-
     steps:
       - name: Checkout source
         uses: actions/checkout@v3
-
+        
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v2
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-
+          
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
           context: ./apps/chat
           push: true
-          tags: ghcr.io/justgithubaccount/chat-api:latest
+          tags: |
+            ghcr.io/justgithubaccount/chat-api:latest
+            ghcr.io/justgithubaccount/chat-api:${{ github.sha }}

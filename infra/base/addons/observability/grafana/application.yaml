@@ -26,7 +26,7 @@ spec:
                 url: http://loki.observability.svc.cluster.local:3100
   destination:
     namespace: observability
-    server: https://kubernetes.default.svc
+    name: CLUSTER
   syncPolicy:
     automated:
       selfHeal: true

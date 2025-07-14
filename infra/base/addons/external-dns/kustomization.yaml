@@ -1,2 +1,3 @@
 resources:
   - application.yaml
+  - secret-cloudflare-external-dns-sealed.yaml

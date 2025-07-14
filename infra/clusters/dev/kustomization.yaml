@@ -6,6 +6,7 @@ resources:
   - ../../base/addons/ingress-nginx
   - ../../base/addons/cert-manager
   - ../../base/addons/external-dns
+  - ../../base/addons/longhorn
   - ../../base/addons/observability/loki
   - ../../base/addons/observability/grafana
   - ../../base/services/agent/chat

@@ -4,7 +4,7 @@ metadata:
   name: ingress-nginx
   namespace: argocd
   annotations:
-    argocd.argoproj.io/sync-wave: "1"  # Устанавливается первым
+    argocd.argoproj.io/sync-wave: "0"  # Устанавливается первым
 spec:
   project: default
   destination:
@@ -24,10 +24,10 @@ spec:
             default: true
           metrics:
             enabled: true
-          admissionWebhooks:
-            enabled: true
-            timeoutSeconds: 30  # Увеличиваем timeout
-            failurePolicy: Ignore
+          # admissionWebhooks:
+          #   enabled: true
+          #   timeoutSeconds: 30  # Увеличиваем timeout
+          #   failurePolicy: Ignore
   syncPolicy:
     automated:
       selfHeal: true

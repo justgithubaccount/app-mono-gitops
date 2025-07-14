@@ -38,9 +38,9 @@ vector:
 
 # --- Ingress (экспонирование наружу, балансировка, TLS) ---
 ingress:
-  enabled: true                                    # Включить/выключить Ingress
+  enabled: false                                    # Включить/выключить Ingress
   className: nginx                                 # Класс контроллера (nginx, traefik и др)
-  host: chatapi.example.com                        # DNS-имя, по которому будет доступен сервис
+  host: chat.syncjob.ru                        # DNS-имя, по которому будет доступен сервис
   path: /                                          # Базовый path
   tls: false                                       # Включить TLS (true/false)
   tlsSecretName: ""                                # Имя Secret'а для TLS-серта, если включён

@@ -1,3 +1,5 @@
 resources:
   - application.yaml
   - secret-cloudflare-cert-manager-sealed.yaml
+  - cert-cluster.yaml
+  - issuer-cluster.yaml

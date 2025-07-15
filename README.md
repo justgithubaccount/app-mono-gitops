@@ -1,4 +1,14 @@
-# 🧠 Bio AI Agents Infrastructure
+# 🧠 Bio AI Agent Infrastructure
+
+# Getting Started (Clear Install)
+Установить в новый кластер с нуля с восстановлением всех ресов кластера на основе роли (секреты нужно обновить)  
+```bash
+kubectl create namespace argocd  
+kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml  
+git clone https://github.com/justgithubaccount/app-release.git  
+cd app-release  
+kubectl apply -f infra/_roles/role-dev-enviroment.yaml  
+```
 
 ## 📄 Содержание
 - 🧠 [Архитектура классов chat-api](readme/chat-api-classes.md)

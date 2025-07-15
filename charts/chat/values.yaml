@@ -1,5 +1,5 @@
 # --- Базовые параметры деплоймента (инфраструктурные) ---
-replicaCount: 2                  # Количество реплик пода (Deployment.spec.replicas)
+replicaCount: 1                  # Количество реплик пода (Deployment.spec.replicas)
 namespace: chat-api              # Namespace, в котором будет развернут сервис
 
 # --- Docker-образ (настройки контейнера) ---

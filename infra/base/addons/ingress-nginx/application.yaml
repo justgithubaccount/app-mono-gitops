@@ -24,6 +24,8 @@ spec:
             default: true
           metrics:
             enabled: true
+          admissionWebhooks:
+            enabled: false
   # syncPolicy:
   #   automated:
   #     selfHeal: true

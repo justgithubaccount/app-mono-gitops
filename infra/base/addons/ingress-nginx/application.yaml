@@ -24,10 +24,10 @@ spec:
             default: true
           metrics:
             enabled: true
-          # admissionWebhooks:
-          #   enabled: true
-          #   timeoutSeconds: 30  # Увеличиваем timeout
-          #   failurePolicy: Ignore
+          admissionWebhooks:
+            enabled: false
+            timeoutSeconds: 30  # Увеличиваем timeout
+            failurePolicy: Ignore
   syncPolicy:
     automated:
       selfHeal: true

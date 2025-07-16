@@ -14,7 +14,7 @@ spec:
   tls:
     - hosts:
         - argo.syncjob.ru
-      secretName: argocd-tls
+      secretName: wildcard-syncjob-tls
   rules:
     - host: argo.syncjob.ru
       http:

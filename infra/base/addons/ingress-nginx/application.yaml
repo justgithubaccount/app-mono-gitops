@@ -24,10 +24,19 @@ spec:
             default: true
           metrics:
             enabled: true
-  syncPolicy:
+  # syncPolicy:
+  #   automated:
+  #     selfHeal: true
+  #     prune: true
+  #   syncOptions:
+  #     - CreateNamespace=true
+  #     - Replace=true  # Для пересоздания проблемных ресурсов
+    syncPolicy:
     automated:
+      allowEmpty: true
       selfHeal: true
       prune: true
     syncOptions:
+      - Validate=true
       - CreateNamespace=true
-      - Replace=true  # Для пересоздания проблемных ресурсов
+      - PruneLast=true

@@ -25,8 +25,8 @@ spec:
           metrics:
             enabled: true
           admissionWebhooks:
-            enabled: false
-            timeoutSeconds: 30  # Увеличиваем timeout
+            enabled: true
+            timeoutSeconds: 30
             failurePolicy: Ignore
   syncPolicy:
     automated:

@@ -5,7 +5,7 @@ metadata:
   namespace: chat-api
   annotations:
     argocd.argoproj.io/sync-wave: "3"  # После ingress-nginx
-    cert-manager.io/cluster-issuer: letsencrypt-dns
+    # cert-manager.io/cluster-issuer: letsencrypt-dns
     ingress.kubernetes.io/ssl-redirect: "true"
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 spec:

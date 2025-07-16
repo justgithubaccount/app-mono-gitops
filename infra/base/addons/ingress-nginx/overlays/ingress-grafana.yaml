@@ -5,6 +5,8 @@ metadata:
   namespace: observability
   annotations:
     argocd.argoproj.io/sync-wave: "3"
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 spec:
   ingressClassName: nginx

@@ -6,6 +6,7 @@ metadata:
   annotations:
     argocd.argoproj.io/sync-wave: "3"  # После ingress-nginx
     # cert-manager.io/cluster-issuer: letsencrypt-dns
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
     ingress.kubernetes.io/ssl-redirect: "true"
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 spec:

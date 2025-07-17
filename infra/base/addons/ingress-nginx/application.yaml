@@ -1,3 +1,7 @@
+# Если admissionWebhooks: enabled: false, то деплой ингресса виснет на хрен поймешь каком этапе намертово
+# Проблема с запуском ingress-nginx была в циклической блокировке webhook. (но это не точно)
+# Проконсультироваться, ибо не production-ready
+
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:

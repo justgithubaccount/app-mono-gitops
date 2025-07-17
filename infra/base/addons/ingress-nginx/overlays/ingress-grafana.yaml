@@ -10,6 +10,10 @@ metadata:
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 spec:
   ingressClassName: nginx
+    tls:
+    - hosts:
+        - grafana.syncjob.ru
+      secretName: wildcard-syncjob-tls
   rules:
     - host: grafana.syncjob.ru
       http:

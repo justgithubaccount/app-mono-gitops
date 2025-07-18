@@ -36,15 +36,15 @@ vector:
   lokiEndpoint: "http://loki.observability.svc.cluster.local:3100"  # Loki endpoint для логов
   env: "public"                                    # Переменная окружения (например, prod/stage/public)
 
-# --- Ingress (экспонирование наружу, балансировка, TLS) ---
-ingress:
-  enabled: false                                    # Включить/выключить Ingress
-  className: nginx                                 # Класс контроллера (nginx, traefik и др)
-  host: chat.syncjob.ru                        # DNS-имя, по которому будет доступен сервис
-  path: /                                          # Базовый path
-  tls: false                                       # Включить TLS (true/false)
-  tlsSecretName: ""                                # Имя Secret'а для TLS-серта, если включён
-  annotations: {}                                  # Дополнительные аннотации Ingress (rate limit, rewrite, etc.)
+# # --- Ingress (экспонирование наружу, балансировка, TLS) ---
+# ingress:
+#   enabled: false                                    # Включить/выключить Ingress
+#   className: nginx                                 # Класс контроллера (nginx, traefik и др)
+#   host: chat.syncjob.ru                        # DNS-имя, по которому будет доступен сервис
+#   path: /                                          # Базовый path
+#   tls: false                                       # Включить TLS (true/false)
+#   tlsSecretName: ""                                # Имя Secret'а для TLS-серта, если включён
+#   annotations: {}                                  # Дополнительные аннотации Ingress (rate limit, rewrite, etc.)
 
 # --- Секретные переменные для контейнера (заполняются через secretsRefName) ---
 secrets:

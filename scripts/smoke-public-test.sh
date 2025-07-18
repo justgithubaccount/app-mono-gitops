@@ -4,7 +4,7 @@ set -e
 ### ============================
 ### 🌐 Public endpoint
 ### ============================
-BASE_CHAT_API="http://chat.syncjob.ru"
+BASE_CHAT_API="https://chat.syncjob.ru"
 
 ### 1. Check /health on litellm
 echo "🔍 [1] Checking /health on litellm"

@@ -40,7 +40,9 @@ spec:
               mountPath: /var/log/litellm
           command: ["/bin/sh", "-c"]
           args:
-            - "litellm --config /app/config.yaml > /var/log/litellm/app.log 2>&1"
+            - "litellm --config /app/config.yaml"
+          #  - "litellm --config /app/config.yaml > /var/log/litellm/app.log 2>&1"
+
           # resources:
           #   requests:
           #     cpu: 100m

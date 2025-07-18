@@ -6,7 +6,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: repoURL: https://github.com/justgithubaccount/app-release
+    repoURL: https://github.com/justgithubaccount/app-release
     targetRevision: HEAD
     path: infra/base/services/llm/gateway
   destination:

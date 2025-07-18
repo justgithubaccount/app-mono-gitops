@@ -29,9 +29,12 @@ spec:
           image: ghcr.io/berriai/litellm:main-latest
           ports:
             - containerPort: 4000
-          envFrom:
-            - secretRef:
-                name: litellm-secrets
+          env:
+            - name: OPENROUTER_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: litellm-secrets
+                  key: api-token                
           volumeMounts:
             - name: config
               mountPath: /app/config.yaml

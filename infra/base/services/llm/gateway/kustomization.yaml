@@ -1,4 +1,5 @@
 resources:
+- application.yaml
 - litellm-configmap.yaml
 - litellm-secrets-sealed.yaml
 - litellm-vector-configmap.yaml

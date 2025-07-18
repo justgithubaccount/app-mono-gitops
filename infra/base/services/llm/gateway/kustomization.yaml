@@ -1,7 +1,7 @@
 resources:
-- application.yaml
-# - litellm-configmap.yaml
-# - litellm-secrets-sealed.yaml
-# - litellm-vector-configmap.yaml
-# - litellm-deployment.yaml
-# - litellm-service.yaml
+# - application.yaml
+- litellm-configmap.yaml
+- litellm-secrets-sealed.yaml
+- litellm-vector-configmap.yaml
+- litellm-deployment.yaml
+- litellm-service.yaml

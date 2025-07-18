@@ -10,7 +10,8 @@ spec:
     targetRevision: HEAD
     path: infra/base/services/llm/gateway
   destination:
-    server: https://kubernetes.default.svc
+    name: CLUSTER
+    # server: https://kubernetes.default.svc
     namespace: chat-api
   syncPolicy:
     automated:

@@ -17,7 +17,7 @@ service:
 
 postgres:
   externalService:
-    enabled: true                                  
+    enabled: false                                  
     host: "192.168.0.9"  
 
 # --- Конфиг Vector (для логгирования, observability) ---

@@ -18,20 +18,20 @@ curl --fail -s -o /dev/null -w "openapi.json: %{http_code}\n" "$BASE_CHAT_API/op
 echo "🔍 [3] Checking /docs UI"
 curl --fail -s -o /dev/null -w "docs: %{http_code}\n" "$BASE_CHAT_API/docs"
 
-### 4. POST /chat/completions (litellm logic)
-echo "🧠 [4] Checking litellm: /chat/completions"
-RESPONSE=$(curl -s -X POST "$BASE_CHAT_API/chat/completions" \
-  -H 'Content-Type: application/json' \
-  -d '{
-    "model": "openai/gpt-4.1",
-    "messages": [
-      {"role": "system", "content": "Ты ассистент, отвечай лаконично."},
-      {"role": "user", "content": "Привет! Скажи как дела?"}
-    ]
-  }')
-echo "🔁 litellm response:"
-echo "$RESPONSE"
-echo
+# ### 4. POST /chat/completions (litellm logic)
+# echo "🧠 [4] Checking litellm: /chat/completions"
+# RESPONSE=$(curl -s -X POST "$BASE_CHAT_API/chat/completions" \
+#   -H 'Content-Type: application/json' \
+#   -d '{
+#     "model": "openai/gpt-4.1",
+#     "messages": [
+#       {"role": "system", "content": "Ты ассистент, отвечай лаконично."},
+#       {"role": "user", "content": "Привет! Скажи как дела?"}
+#     ]
+#   }')
+# echo "🔁 litellm response:"
+# echo "$RESPONSE"
+# echo
 
 ### 5. Old /chat endpoint (chat-api legacy)
 echo "💬 [5] Checking chat-api legacy endpoint"

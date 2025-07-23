@@ -29,6 +29,11 @@ chat_counter = meter.create_counter("chat_requests_total")
 def get_chat_service():
     return ChatService()
 
+def json_serial(obj):
+    if isinstance(obj, datetime):
+        return obj.isoformat()
+    raise TypeError(f"Type {type(obj)} not serializable")
+
 @api_router.post("/chat", response_model=ChatResponse)
 async def chat_endpoint(
     req: ChatRequest,
@@ -118,7 +123,7 @@ async def chat_in_project(
         ]
         history_db = ChatHistoryDB(
             project_id=project_id,
-            messages=json.dumps([m.model_dump() for m in chat_messages]),
+            messages=json.dumps([m.model_dump() for m in chat_messages], default=json_serial),
             trace_id=trace_id,
             span_id=span_id,
         )

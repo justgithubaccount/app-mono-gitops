@@ -15,6 +15,11 @@ service:
   type: ClusterIP                                  # Тип сервис (ClusterIP, NodePort, LoadBalancer)
   port: 80                                         # Внешний порт сервиса (доступен внутри кластера)
 
+postgres:
+  externalService:
+    enabled: true                                  
+    host: "192.168.0.9"  
+
 # --- Конфиг Vector (для логгирования, observability) ---
 vectorConfigMapName: chat-api-vector-config        # Имя ConfigMap с конфигом Vector
 

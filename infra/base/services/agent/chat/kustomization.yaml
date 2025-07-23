@@ -1,4 +1,4 @@
 resources:
   - application.yaml
   - pg-secrets-sealed.yaml
-  - pg-service.yaml
+#  - pg-service.yaml

@@ -10,7 +10,7 @@ spec:
   source:
     repoURL: https://github.com/justgithubaccount/app-release
     path: charts/consul
-    targetRevision: 1.8.0
+    targetRevision: HEAD
     helm:
       values: |
         global:

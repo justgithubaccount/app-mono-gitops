@@ -1,0 +1,32 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: consul
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  project: default
+  source:
+    repoURL: https://helm.releases.hashicorp.com
+    chart: consul
+    targetRevision: 1.8.0
+    helm:
+      values: |
+        global:
+          name: consul
+        ui:
+          enabled: true
+        server:
+          replicas: 1
+        client:
+          enabled: true
+  destination:
+    name: CLUSTER
+    namespace: consul
+  syncPolicy:
+    automated:
+      selfHeal: true
+      prune: true
+    syncOptions:
+      - CreateNamespace=true

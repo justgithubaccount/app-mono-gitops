@@ -14,6 +14,8 @@ resources:
   - ../../base/addons/observability/grafana
   - ../../base/services/agent/chat
   - ../../base/services/llm/gateway
+  - ../../base/addons/consul
+  - ../../base/addons/external-secrets
 
 patches:
   # Override .spec.destination.name

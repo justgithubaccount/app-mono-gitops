@@ -15,12 +15,17 @@ spec:
       values: |
         global:
           name: consul
+        acl:
+          enabled: true
+          defaultPolicy: "deny"
+          enableTokenPersistence: true
         acls:
           manageSystemACLs: true
         ui:
           enabled: true
         server:
           replicas: 1
+          updatePartition: 0
         client:
           enabled: true
   destination:

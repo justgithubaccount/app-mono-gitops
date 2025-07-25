@@ -8,8 +8,8 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://helm.releases.hashicorp.com
-    chart: consul
+    repoURL: https://github.com/justgithubaccount/app-release
+    path: charts/consul
     targetRevision: 1.8.0
     helm:
       values: |

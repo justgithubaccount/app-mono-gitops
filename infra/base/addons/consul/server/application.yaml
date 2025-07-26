@@ -1,0 +1,68 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: consul-server
+  namespace: argocd
+  labels:
+    app.kubernetes.io/component: server
+    app.kubernetes.io/part-of: consul
+  annotations:
+    argocd.argoproj.io/sync-wave: "10"
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/justgithubaccount/app-release
+    path: charts/consul
+    targetRevision: HEAD
+    helm:
+      values: |
+        global:
+          name: consul
+          datacenter: dc1
+          tls:
+            enabled: true
+            enableAutoEncrypt: true
+            internalCerts:
+              enabled: true
+              
+        # Zone: Control Plane only
+        server:
+          replicas: 3
+          bootstrapExpect: 3
+          updatePartition: 0
+          extraConfig: |
+            {
+              "acl": {
+                "enabled": true,
+                "default_policy": "deny",
+                "enable_token_persistence": true
+              }
+            }
+          resources:
+            requests:
+              memory: 256Mi
+              cpu: 100m
+            limits:
+              memory: 512Mi
+              cpu: 250m
+              
+        # Everything else disabled
+        client:
+          enabled: false
+        ui:
+          enabled: false
+        connectInject:
+          enabled: false
+        ingressGateways:
+          enabled: false
+          
+  destination:
+    name: CLUSTER
+    namespace: consul
+  syncPolicy:
+    automated:
+      selfHeal: true
+      prune: true
+    syncOptions:
+      - CreateNamespace=true
+      - RespectIgnoreDifferences=true

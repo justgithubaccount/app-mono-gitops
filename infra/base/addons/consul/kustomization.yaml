@@ -1,2 +1,13 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
 resources:
-  - application.yaml
+  # Applications по зонам ответственности
+  - server/application.yaml
+  - client/application.yaml
+  - mesh/application.yaml
+  
+# Общие лейблы для всех Applications
+commonLabels:
+  app.kubernetes.io/managed-by: argocd
+  app.kubernetes.io/instance: consul

@@ -1,3 +1,5 @@
+# vol 1
+
 # apiVersion: argoproj.io/v1alpha1
 # kind: Application
 # metadata:
@@ -43,71 +45,73 @@
 #     syncOptions:
 #       - CreateNamespace=true
 
-apiVersion: argoproj.io/v1alpha1
-kind: Application
-metadata:
-  name: consul
-  namespace: argocd
-  annotations:
-    argocd.argoproj.io/sync-wave: "4"
-spec:
-  project: default
-  source:
-    repoURL: https://github.com/justgithubaccount/app-release
-    path: charts/consul
-    targetRevision: HEAD
-    helm:
-      values: |
-        global:
-          name: consul
-          datacenter: dc1
-          tls:
-            enabled: true
-            enableAutoEncrypt: true
-            internalCerts:
-              enabled: true
+# vol 2
 
-        acls:
-          manageSystemACLs: true
+# apiVersion: argoproj.io/v1alpha1
+# kind: Application
+# metadata:
+#   name: consul
+#   namespace: argocd
+#   annotations:
+#     argocd.argoproj.io/sync-wave: "4"
+# spec:
+#   project: default
+#   source:
+#     repoURL: https://github.com/justgithubaccount/app-release
+#     path: charts/consul
+#     targetRevision: HEAD
+#     helm:
+#       values: |
+#         global:
+#           name: consul
+#           datacenter: dc1
+#           tls:
+#             enabled: true
+#             enableAutoEncrypt: true
+#             internalCerts:
+#               enabled: true
 
-        ui:
-          enabled: true
-          service:
-            type: ClusterIP
+#         acls:
+#           manageSystemACLs: true
 
-        server:
-          replicas: 3
-          updatePartition: 0
-          extraConfig: |
-            {
-              "acl": {
-                "enabled": true,
-                "default_policy": "deny",
-                "enable_token_persistence": true
-              }
-            }
+#         ui:
+#           enabled: true
+#           service:
+#             type: ClusterIP
 
-        client:
-          enabled: true
+#         server:
+#           replicas: 3
+#           updatePartition: 0
+#           extraConfig: |
+#             {
+#               "acl": {
+#                 "enabled": true,
+#                 "default_policy": "deny",
+#                 "enable_token_persistence": true
+#               }
+#             }
 
-        ingressGateways:
-          enabled: true
-          defaults:
-            tls:
-              enabled: true
-              secretName: wildcard-syncjob-tls
+#         client:
+#           enabled: true
 
-        connectInject:
-          enabled: true
-          tls:
-            enabled: true
+#         ingressGateways:
+#           enabled: true
+#           defaults:
+#             tls:
+#               enabled: true
+#               secretName: wildcard-syncjob-tls
 
-  destination:
-    name: CLUSTER
-    namespace: consul
-  syncPolicy:
-    automated:
-      selfHeal: true
-      prune: true
-    syncOptions:
-      - CreateNamespace=true
+#         connectInject:
+#           enabled: true
+#           tls:
+#             enabled: true
+
+#   destination:
+#     name: CLUSTER
+#     namespace: consul
+#   syncPolicy:
+#     automated:
+#       selfHeal: true
+#       prune: true
+#     syncOptions:
+#       - CreateNamespace=true

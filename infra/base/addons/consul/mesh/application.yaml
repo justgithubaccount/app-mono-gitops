@@ -15,6 +15,7 @@ spec:
     path: charts/consul
     targetRevision: HEAD
     helm:
+      releaseName: consul-mesh
       values: |
         global:
           name: consul

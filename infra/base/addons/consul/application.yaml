@@ -64,6 +64,8 @@ spec:
           tls:
             enabled: true
             enableAutoEncrypt: true
+            internalCerts:
+              enabled: true
 
         acls:
           manageSystemACLs: true

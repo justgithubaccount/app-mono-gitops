@@ -6,6 +6,7 @@ resources:
   - server/application.yaml
   - client/application.yaml
   - mesh/application.yaml
+  - webhooks/application.yaml
   
 # Общие лейблы для всех Applications
 commonLabels:

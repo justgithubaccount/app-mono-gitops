@@ -31,7 +31,7 @@ spec:
             type: ClusterIP
             
         connectInject:
-          enabled: true
+          enabled: false  
           default: false  # Opt-in for production
           tls:
             enabled: true

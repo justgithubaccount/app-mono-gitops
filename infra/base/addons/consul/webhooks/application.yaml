@@ -1,0 +1,56 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: consul-webhooks
+  namespace: argocd
+  labels:
+    app.kubernetes.io/component: webhooks
+    app.kubernetes.io/part-of: consul
+  annotations:
+    argocd.argoproj.io/sync-wave: "13"
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/justgithubaccount/app-release
+    path: charts/consul
+    targetRevision: HEAD
+    helm:
+      releaseName: consul-webhooks
+      values: |
+        global:
+          name: consul
+          datacenter: dc1
+          tls:
+            enabled: true
+            enableAutoEncrypt: true
+            
+        # Только webhook компоненты
+        connectInject:
+          enabled: true
+          default: false
+          replicas: 1
+          webhook:
+            failurePolicy: Ignore
+          namespaceSelector: |
+            matchExpressions:
+            - key: consul-inject
+              operator: In
+              values: ["enabled"]
+              
+        # Всё остальное выключено
+        server:
+          enabled: false
+        client:
+          enabled: false
+        ui:
+          enabled: false
+        ingressGateways:
+          enabled: false
+          
+  destination:
+    name: CLUSTER
+    namespace: consul
+  syncPolicy:
+    automated:
+      selfHeal: true
+      prune: true

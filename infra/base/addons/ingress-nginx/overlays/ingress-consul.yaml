@@ -6,7 +6,7 @@ metadata:
   annotations:
     nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
-    argocd.argoproj.io/sync-wave: "13"
+    argocd.argoproj.io/sync-wave: "22"
     external-dns.alpha.kubernetes.io/force-override: "true"
 spec:
   ingressClassName: nginx

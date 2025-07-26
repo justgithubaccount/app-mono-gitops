@@ -1,0 +1,27 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: consul-ui
+  namespace: consul
+  annotations:
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    argocd.argoproj.io/sync-wave: "3"
+    external-dns.alpha.kubernetes.io/force-override: "true"
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - consul.syncjob.ru
+      secretName: wildcard-syncjob-tls
+  rules:
+    - host: consul.syncjob.ru
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: consul-ui
+                port:
+                  number: 443

@@ -32,7 +32,7 @@ spec:
             
         connectInject:
           enabled: false  
-          default: false  # Opt-in for production
+          # default: false  # Opt-in for production
           tls:
             enabled: true
           transparentProxy:

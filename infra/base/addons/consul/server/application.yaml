@@ -17,6 +17,8 @@ spec:
     helm:
       releaseName: consul-server
       values: |
+        argocd:
+          enabled: true
         global:
           name: consul
           datacenter: dc1

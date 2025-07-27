@@ -67,5 +67,6 @@ spec:
       selfHeal: true
       prune: true
     syncOptions:
+      - Validate=true
       - CreateNamespace=true
-      - RespectIgnoreDifferences=true
+      - PruneLast=true

@@ -3,4 +3,4 @@ resources:
   - overlays/ingress-chat.yaml
   - overlays/ingress-grafana.yaml
   - overlays/ingress-argo.yaml
-  - overlays/ingress-consul.yaml
+#  - overlays/ingress-consul.yaml

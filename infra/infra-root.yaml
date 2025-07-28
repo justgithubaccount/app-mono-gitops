@@ -7,7 +7,7 @@ spec:
   project: default
   source:
     repoURL: https://github.com/justgithubaccount/app-release.git
-    path: infra/_roles
+    path: infra/roles
     directory:
       recurse: true
   destination:

@@ -1,80 +1,180 @@
-from typing import List, Optional
-from ..schemas import Message
-from ..core.config import get_settings
-from app.logger import enrich_context
+import os
 import httpx
 import time
+from typing import Dict, List, Optional
+from opentelemetry import trace, metrics
+from opentelemetry.trace import Status, StatusCode
+from opentelemetry.instrumentation.httpx import HTTPXClientInstrumentor
 
-class LLMClient:
-    def __init__(self, settings=None):
-        self.settings = settings or get_settings()
-        enrich_context(
-            event="llm_client_init",
-            model=self.settings.chat_model,
-            llm_api_url=self.settings.llm_api_url,
-        ).info("LLM client initialized")
+# Инструментируем httpx для автоматического трейсинга HTTP запросов
+HTTPXClientInstrumentor().instrument()
 
-    async def generate_reply(
+# Получаем tracer и meter
+tracer = trace.get_tracer(__name__)
+meter = metrics.get_meter(__name__)
+
+# Метрики
+llm_request_counter = meter.create_counter(
+    name="llm_requests_total",
+    description="Total number of LLM requests",
+    unit="1"
+)
+
+llm_request_duration = meter.create_histogram(
+    name="llm_request_duration_seconds",
+    description="LLM request duration in seconds",
+    unit="s"
+)
+
+llm_tokens_counter = meter.create_counter(
+    name="llm_tokens_total",
+    description="Total tokens used",
+    unit="1"
+)
+
+class OpenRouterClient:
+    def __init__(self):
+        # Из секрета
+        self.api_key = os.getenv("OPENROUTER_API_KEY")
+        
+        # Из конфига
+        self.api_url = os.getenv("OPENROUTER_API_URL", "https://openrouter.ai/api/v1/chat/completions")
+        self.default_model = os.getenv("OPENROUTER_MODEL", "anthropic/claude-opus-4")
+        self.http_referer = os.getenv("OPENROUTER_HTTP_REFERER", "")
+        self.x_title = os.getenv("OPENROUTER_X_TITLE", "")
+        
+    async def chat_completion(
         self,
-        messages: List[Message],
-        user_api_key: Optional[str] = None,
-        project_id: Optional[str] = None,
-        trace_id: Optional[str] = None,
-    ) -> str:
-        user_message = messages[-1].content if messages else ""
-
-        log = enrich_context(
-            event="llm_generate_reply",
-            project_id=project_id,
-            user_message=user_message,
-            model=self.settings.chat_model,
-            trace_id=trace_id,
-        )
-
-        log.bind(event="llm_request_sent").info("Sending request to LLM")
-
-        try:
-            start = time.time()
-            async with httpx.AsyncClient(timeout=15.0) as client:
-                response = await client.post(
-                    f"{self.settings.llm_api_url}/chat/completions",
-                    json={
-                        "model": self.settings.chat_model,
-                        "messages": [m.dict() for m in messages],
-                    },
+        messages: List[Dict[str, str]],
+        model: Optional[str] = None,
+        **kwargs
+    ) -> Dict:
+        """
+        Отправка запроса к OpenRouter API с полным OpenTelemetry трейсингом.
+        """
+        model_name = model or self.default_model
+        
+        # Создаем span для всей операции
+        with tracer.start_as_current_span(
+            "openrouter_chat_completion",
+            attributes={
+                "llm.model": model_name,
+                "llm.provider": "openrouter",
+                "llm.message_count": len(messages),
+            }
+        ) as span:
+            start_time = time.time()
+            
+            try:
+                # Подготовка заголовков
+                headers = {
+                    "Authorization": f"Bearer {self.api_key}",
+                    "Content-Type": "application/json",
+                }
+                
+                # Опциональные заголовки для OpenRouter
+                if self.http_referer:
+                    headers["HTTP-Referer"] = self.http_referer
+                    span.set_attribute("llm.http_referer", self.http_referer)
+                if self.x_title:
+                    headers["X-Title"] = self.x_title
+                    span.set_attribute("llm.x_title", self.x_title)
+                
+                # Подготовка запроса
+                request_body = {
+                    "model": model_name,
+                    "messages": messages,
+                    **kwargs
+                }
+                
+                # Логируем размер запроса
+                request_size = len(str(messages))
+                span.set_attribute("llm.request_size", request_size)
+                
+                # Создаем отдельный span для HTTP запроса
+                with tracer.start_as_current_span("http_request") as http_span:
+                    async with httpx.AsyncClient() as client:
+                        response = await client.post(
+                            self.api_url,
+                            headers=headers,
+                            json=request_body,
+                            timeout=60.0
+                        )
+                        response.raise_for_status()
+                        result = response.json()
+                
+                # Обработка успешного ответа
+                duration = time.time() - start_time
+                
+                # Извлекаем метрики из ответа
+                usage = result.get("usage", {})
+                prompt_tokens = usage.get("prompt_tokens", 0)
+                completion_tokens = usage.get("completion_tokens", 0)
+                total_tokens = usage.get("total_tokens", 0)
+                
+                # Устанавливаем атрибуты span
+                span.set_attribute("llm.prompt_tokens", prompt_tokens)
+                span.set_attribute("llm.completion_tokens", completion_tokens)
+                span.set_attribute("llm.total_tokens", total_tokens)
+                span.set_attribute("llm.duration_seconds", duration)
+                span.set_attribute("llm.response_id", result.get("id", ""))
+                
+                # Записываем метрики
+                labels = {"model": model_name, "status": "success"}
+                llm_request_counter.add(1, labels)
+                llm_request_duration.record(duration, labels)
+                llm_tokens_counter.add(total_tokens, {"model": model_name, "type": "total"})
+                llm_tokens_counter.add(prompt_tokens, {"model": model_name, "type": "prompt"})
+                llm_tokens_counter.add(completion_tokens, {"model": model_name, "type": "completion"})
+                
+                span.set_status(Status(StatusCode.OK))
+                return result
+                
+            except httpx.HTTPStatusError as e:
+                # Обработка HTTP ошибок
+                duration = time.time() - start_time
+                
+                span.set_attribute("http.status_code", e.response.status_code)
+                span.set_attribute("error.type", "http_error")
+                span.set_attribute("error.message", str(e))
+                span.set_status(
+                    Status(StatusCode.ERROR, f"HTTP {e.response.status_code}: {str(e)}")
                 )
-                response.raise_for_status()
-                data = response.json()
-            duration = time.time() - start
-
-        except httpx.RequestError as e:
-            log.bind(
-                event="llm_network_error",
-                error=str(e)
-            ).error("Network error during LLM call")
-            raise
-
-        except httpx.HTTPStatusError as e:
-            log.bind(
-                event="llm_http_error",
-                status_code=e.response.status_code,
-                response=e.response.text
-            ).error("HTTP error during LLM call")
-            raise
-
-        if "choices" not in data or not data["choices"]:
-            log.bind(
-                event="llm_malformed_response",
-                data=data
-            ).error("Malformed response from LLM")
-            raise ValueError("Malformed LLM response")
-
-        reply = data["choices"][0]["message"]["content"]
-
-        log.bind(
-            event="llm_response_received",
-            ai_reply=reply,
-            latency=duration,
-        ).info("LLM replied successfully")
-
-        return reply
+                
+                # Метрики для ошибок
+                labels = {"model": model_name, "status": "error", "error_type": "http"}
+                llm_request_counter.add(1, labels)
+                llm_request_duration.record(duration, labels)
+                
+                # Добавляем событие в span
+                span.add_event(
+                    "HTTP Error",
+                    attributes={
+                        "status_code": e.response.status_code,
+                        "response_body": e.response.text[:500]  # Первые 500 символов
+                    }
+                )
+                raise
+                
+            except Exception as e:
+                # Обработка других ошибок
+                duration = time.time() - start_time
+                
+                span.set_attribute("error.type", type(e).__name__)
+                span.set_attribute("error.message", str(e))
+                span.set_status(Status(StatusCode.ERROR, str(e)))
+                
+                # Метрики для ошибок
+                labels = {"model": model_name, "status": "error", "error_type": "exception"}
+                llm_request_counter.add(1, labels)
+                llm_request_duration.record(duration, labels)
+                
+                # Добавляем событие в span
+                span.add_event(
+                    "Exception occurred",
+                    attributes={
+                        "exception.type": type(e).__name__,
+                        "exception.message": str(e)
+                    }
+                )
+                raise

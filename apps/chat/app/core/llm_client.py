@@ -242,4 +242,3 @@ class OpenRouterClient:
     def model_name(self) -> str:
         """Свойство для совместимости с ChatService."""
         return self.default_model
-                raise

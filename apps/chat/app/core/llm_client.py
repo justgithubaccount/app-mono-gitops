@@ -177,4 +177,69 @@ class OpenRouterClient:
                         "exception.message": str(e)
                     }
                 )
+# apps/chat/app/core/llm_client.py
+# В конец класса OpenRouterClient добавь:
+
+    async def generate_reply(
+        self,
+        messages: List,  # List[Message] из schemas
+        user_api_key: Optional[str] = None,
+        project_id: Optional[str] = None,
+        trace_id: Optional[str] = None,
+    ) -> str:
+        """
+        Метод для совместимости с ChatService.
+        Преобразует список Message объектов в формат OpenRouter.
+        """
+        # Добавляем атрибуты в текущий span если есть
+        current_span = trace.get_current_span()
+        if current_span.is_recording():
+            if project_id:
+                current_span.set_attribute("project.id", project_id)
+            if trace_id:
+                current_span.set_attribute("external.trace_id", trace_id)
+        
+        # Преобразуем Message объекты в dict для OpenRouter
+        openrouter_messages = []
+        for msg in messages:
+            if hasattr(msg, 'role') and hasattr(msg, 'content'):
+                # Если это объект Message
+                openrouter_messages.append({
+                    "role": msg.role,
+                    "content": msg.content
+                })
+            elif isinstance(msg, dict):
+                # Если уже dict
+                openrouter_messages.append(msg)
+            else:
+                # Fallback
+                openrouter_messages.append({
+                    "role": "user",
+                    "content": str(msg)
+                })
+        
+        # Используем переданный API ключ если есть
+        original_key = self.api_key
+        if user_api_key:
+            self.api_key = user_api_key
+        
+        try:
+            # Вызываем основной метод
+            response = await self.chat_completion(
+                messages=openrouter_messages,
+                model=self.default_model
+            )
+            
+            # Извлекаем текст ответа
+            return response["choices"][0]["message"]["content"]
+            
+        finally:
+            # Восстанавливаем оригинальный ключ
+            if user_api_key:
+                self.api_key = original_key
+    
+    @property
+    def model_name(self) -> str:
+        """Свойство для совместимости с ChatService."""
+        return self.default_model
                 raise

@@ -72,7 +72,7 @@ externalServices:
 # === Secrets ===
 # Имя внешнего секрета с OPENROUTER_API_KEY
 secretsRefName: "chat-api-secrets"
-dbSecretRefName: ""
+dbSecretRefName: "chat-api-db"
 
 # PostgreSQL
 postgres:

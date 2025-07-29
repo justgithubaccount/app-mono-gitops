@@ -73,3 +73,19 @@ externalServices:
 # Имя внешнего секрета с OPENROUTER_API_KEY
 secretsRefName: "chat-api-secrets"
 dbSecretRefName: ""
+
+# PostgreSQL
+postgres:
+  externalService:
+    enabled: false
+
+# Ingress
+ingress:
+  enabled: false
+  className: nginx
+  host: ""
+  path: /
+  tls: false
+  
+# Другие возможные секции
+createInternalSecret: false

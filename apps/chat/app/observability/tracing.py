@@ -39,7 +39,7 @@ def setup_tracing(app) -> None:
     
     otlp_trace_exporter = OTLPSpanExporter(
         endpoint=otlp_endpoint,
-        insecure=True,  # В production использовать TLS
+        # insecure=True,  # В production использовать TLS
     )
     
     trace_processor = BatchSpanProcessor(otlp_trace_exporter)

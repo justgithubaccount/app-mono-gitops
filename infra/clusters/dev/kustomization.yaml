@@ -16,6 +16,7 @@ resources:
   - ../../base/services/llm/gateway
 #  - ../../base/addons/consul
   - ../../base/addons/external-secrets
+  - ../../base/addons/observability/vector-gateway
 
 patches:
   # Override .spec.destination.name

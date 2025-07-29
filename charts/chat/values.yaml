@@ -29,7 +29,7 @@ dbSecretRefName: chat-api-db                       # Secret с параметр�
 
 # --- Окружение (env) для приложения ---
 env:
-  OTEL_EXPORTER_OTLP_ENDPOINT: "http://localhost:4318"
+  OTEL_EXPORTER_OTLP_ENDPOINT: "http://vector-gateway.observability.svc.cluster.local:4318"
   OTEL_EXPORTER_OTLP_PROTOCOL: "http/protobuf"
   OTEL_TRACES_EXPORTER: otlp
   OTEL_LOGS_EXPORTER: otlp

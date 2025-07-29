@@ -22,21 +22,25 @@ spec:
             - name: otlp-grpc
               port: 4317
         customConfig:
-          data_dir: /vector-data
-          sources:
-            otel:
-              type: opentelemetry
+        data_dir: /vector-data
+        sources:
+          otel:
+            type: opentelemetry
+            http:
               address: 0.0.0.0:4318
-          sinks:
-            loki:
-              type: loki
-              inputs: ["otel"]
-              endpoint: http://loki.observability.svc.cluster.local:3100
-              encoding:
-                codec: json
-              labels:
-                app: "{{`{{ host }}`}}"
-                env: "dev"
+            grpc:
+              address: 0.0.0.0:4317
+        sinks:
+          loki:
+            type: loki
+            inputs:
+              - otel
+            endpoint: http://loki.observability.svc.cluster.local:3100
+            encoding:
+              codec: json
+            labels:
+              app: "{{`{{ host }}`}}"
+              env: dev
   destination:
     name: CLUSTER
     namespace: observability

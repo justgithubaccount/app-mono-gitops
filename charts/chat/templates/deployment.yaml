@@ -4,24 +4,29 @@ metadata:
   name: {{ include "chat-api.fullname" . }}
   namespace: {{ .Values.namespace | default "chat-api" }}
   labels:
-    app: {{ include "chat-api.name" . }}
+    {{- include "chat-api.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      app: {{ include "chat-api.name" . }}
+      {{- include "chat-api.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       labels:
-        app: {{ include "chat-api.name" . }}
+        {{- include "chat-api.selectorLabels" . | nindent 8 }}
     spec:
+      serviceAccountName: {{ include "chat-api.fullname" . }}
       containers:
         - name: chat-api
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - containerPort: {{ .Values.containerPort }}
+              name: http
           env:
+            # OpenTelemetry configuration
+            - name: OTEL_SERVICE_NAME
+              value: {{ .Values.env.OTEL_SERVICE_NAME | default "chat-api" | quote }}
             - name: OTEL_EXPORTER_OTLP_ENDPOINT
               value: {{ .Values.env.OTEL_EXPORTER_OTLP_ENDPOINT | quote }}
             - name: OTEL_EXPORTER_OTLP_PROTOCOL
@@ -30,8 +35,33 @@ spec:
               value: {{ .Values.env.OTEL_TRACES_EXPORTER | quote }}
             - name: OTEL_LOGS_EXPORTER
               value: {{ .Values.env.OTEL_LOGS_EXPORTER | quote }}
-            - name: OTEL_SERVICE_NAME
-              value: {{ .Values.env.OTEL_SERVICE_NAME | quote }}
+            
+            # Environment
+            - name: ENVIRONMENT
+              value: {{ .Values.env.ENVIRONMENT | default "production" | quote }}
+            - name: APP_VERSION
+              value: {{ .Chart.AppVersion | quote }}
+            - name: LOG_LEVEL
+              value: {{ .Values.env.LOG_LEVEL | default "INFO" | quote }}
+            
+            # Kubernetes metadata
+            - name: K8S_NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+            - name: K8S_POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: K8S_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: K8S_POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+                  
           envFrom:
             - secretRef:
                 name: {{ .Values.secretsRefName | default "chat-api-secrets" }}
@@ -39,18 +69,31 @@ spec:
             - secretRef:
                 name: {{ .Values.dbSecretRefName }}
             {{- end }}
+            
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+            
           readinessProbe:
             httpGet:
               path: /health
-              port: {{ .Values.containerPort }}
-            initialDelaySeconds: 2
-            periodSeconds: 10
+              port: http
+            initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds | default 5 }}
+            periodSeconds: {{ .Values.readinessProbe.periodSeconds | default 10 }}
+            
           livenessProbe:
             httpGet:
               path: /health
-              port: {{ .Values.containerPort }}
-            initialDelaySeconds: 2
-            periodSeconds: 10
+              port: http
+            initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds | default 10 }}
+            periodSeconds: {{ .Values.livenessProbe.periodSeconds | default 30 }}
+            
+          {{- if .Values.command }}
+          command: {{ .Values.command }}
+          {{- end }}
+          {{- if .Values.args }}
+          args: {{ .Values.args }}
+          {{- else }}
           command: ["/bin/sh", "-c"]
           args:
             - uvicorn app.main:app --host 0.0.0.0 --port {{ .Values.containerPort }}
+          {{- end }}

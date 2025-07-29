@@ -34,7 +34,7 @@ spec:
             loki:
               type: loki
               inputs:
-                - otel
+                - otel.logs
               endpoint: http://loki.observability.svc.cluster.local:3100
               encoding:
                 codec: json

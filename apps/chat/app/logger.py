@@ -1,30 +1,86 @@
 import logging
-import sys
-
+from contextvars import ContextVar
+from typing import Any, Dict, Optional
+from opentelemetry import trace
 import structlog
-from opentelemetry.trace import get_current_span
 
-logging.basicConfig(
-    format="%(message)s", stream=sys.stdout, level=logging.INFO
-)
+# Context variables для хранения дополнительных атрибутов
+log_context: ContextVar[Dict[str, Any]] = ContextVar('log_context', default={})
 
-def add_trace_context(_, __, event_dict):
-    span = get_current_span()
-    if span and span.get_span_context().trace_id != 0:
-        ctx = span.get_span_context()
-        event_dict["trace_id"] = format(ctx.trace_id, "032x")
-        event_dict["span_id"] = format(ctx.span_id, "016x")
-    return event_dict
+class EnrichedLogger:
+    """
+    Logger с автоматическим добавлением OpenTelemetry контекста.
+    Совместим с существующим интерфейсом enrich_context.
+    """
+    def __init__(self, logger: structlog.BoundLogger):
+        self.logger = logger
+    
+    def _add_trace_context(self, event_dict: Dict[str, Any]) -> Dict[str, Any]:
+        """Добавляет trace_id и span_id из текущего контекста."""
+        span = trace.get_current_span()
+        if span.is_recording():
+            span_context = span.get_span_context()
+            event_dict['trace_id'] = format(span_context.trace_id, '032x')
+            event_dict['span_id'] = format(span_context.span_id, '016x')
+        
+        # Добавляем контекстные переменные
+        event_dict.update(log_context.get())
+        
+        return event_dict
+    
+    def bind(self, **kwargs) -> 'EnrichedLogger':
+        """Добавляет контекст к логгеру."""
+        return EnrichedLogger(self.logger.bind(**kwargs))
+    
+    def info(self, msg: str, **kwargs):
+        kwargs = self._add_trace_context(kwargs)
+        self.logger.info(msg, **kwargs)
+    
+    def error(self, msg: str, **kwargs):
+        kwargs = self._add_trace_context(kwargs)
+        self.logger.error(msg, **kwargs)
+    
+    def warning(self, msg: str, **kwargs):
+        kwargs = self._add_trace_context(kwargs)
+        self.logger.warning(msg, **kwargs)
+    
+    def debug(self, msg: str, **kwargs):
+        kwargs = self._add_trace_context(kwargs)
+        self.logger.debug(msg, **kwargs)
 
+# Инициализация structlog
 structlog.configure(
-    wrapper_class=structlog.make_filtering_bound_logger(logging.INFO),
     processors=[
-        structlog.processors.TimeStamper(fmt="iso", key="timestamp"),
-        add_trace_context,
-        structlog.processors.JSONRenderer(),
+        structlog.stdlib.filter_by_level,
+        structlog.stdlib.add_logger_name,
+        structlog.stdlib.add_log_level,
+        structlog.stdlib.PositionalArgumentsFormatter(),
+        structlog.processors.TimeStamper(fmt="iso"),
+        structlog.processors.StackInfoRenderer(),
+        structlog.processors.format_exc_info,
+        structlog.processors.UnicodeDecoder(),
+        structlog.processors.JSONRenderer()
     ],
+    context_class=dict,
     logger_factory=structlog.stdlib.LoggerFactory(),
+    cache_logger_on_first_use=True,
 )
 
-def enrich_context(event: str, **kwargs):
-    return structlog.get_logger("chat").bind(event=event, **kwargs)
+# Базовый логгер
+base_logger = structlog.get_logger()
+
+def enrich_context(**kwargs) -> EnrichedLogger:
+    """
+    Создает логгер с обогащенным контекстом.
+    Совместимо с существующим кодом.
+    """
+    return EnrichedLogger(base_logger.bind(**kwargs))
+
+def set_request_context(**kwargs):
+    """
+    Устанавливает контекст для всего request.
+    Используется в middleware или в начале обработки запроса.
+    """
+    current_context = log_context.get()
+    current_context.update(kwargs)
+    log_context.set(current_context)

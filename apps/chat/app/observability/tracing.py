@@ -1,11 +1,13 @@
 import logging
 import os
-from opentelemetry import trace, logs
+from opentelemetry import trace
 from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
 from opentelemetry.sdk.resources import Resource
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import BatchSpanProcessor
 from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
+# Правильный импорт для логов
+from opentelemetry._logs import set_logger_provider
 from opentelemetry.sdk._logs import LoggerProvider, LoggingHandler
 from opentelemetry.sdk._logs.export import BatchLogRecordProcessor
 from opentelemetry.exporter.otlp.proto.http._log_exporter import OTLPLogExporter
@@ -13,6 +15,7 @@ from opentelemetry.exporter.otlp.proto.http._log_exporter import OTLPLogExporter
 def setup_tracing(app) -> None:
     """
     Настройка OpenTelemetry для traces и logs согласно CNCF практикам.
+    Production-ready конфигурация для Kubernetes.
     """
     # Resource с метаданными сервиса и Kubernetes
     resource = Resource(attributes={
@@ -24,37 +27,34 @@ def setup_tracing(app) -> None:
         "k8s.namespace": os.getenv("K8S_NAMESPACE", "chat"),
         "k8s.node.name": os.getenv("K8S_NODE_NAME", "unknown"),
         "k8s.deployment.name": os.getenv("K8S_DEPLOYMENT_NAME", "chat-api"),
-        # Дополнительные метаданные для трассировки
+        # Дополнительные метаданные
         "k8s.container.name": os.getenv("K8S_CONTAINER_NAME", "chat-api"),
         "k8s.pod.uid": os.getenv("K8S_POD_UID", "unknown"),
     })
     
-    # OTLP endpoint согласно OpenTelemetry specification
-    # В production используем service mesh или sidecar pattern
+    # OTLP endpoint - в production используем collector sidecar
     otlp_endpoint = os.getenv(
         "OTEL_EXPORTER_OTLP_ENDPOINT",
-        "http://vector-gateway.observability.svc.cluster.local:4318"
+        "http://otel-collector.observability.svc.cluster.local:4318"
     )
     
-    # Добавляем /v1/traces к endpoint если не указан полный путь
+    # Для HTTP протокола добавляем правильные пути
     traces_endpoint = f"{otlp_endpoint}/v1/traces" if not otlp_endpoint.endswith("/v1/traces") else otlp_endpoint
     logs_endpoint = f"{otlp_endpoint}/v1/logs" if not otlp_endpoint.endswith("/v1/logs") else otlp_endpoint
     
     # === TRACES ===
     provider = TracerProvider(resource=resource)
     
-    # Создаем exporter без параметра insecure
-    # Безопасность определяется через протокол в URL (http vs https)
+    # Создаем exporter без deprecated параметров
     otlp_trace_exporter = OTLPSpanExporter(
         endpoint=traces_endpoint,
-        # headers можно использовать для auth если нужно
+        # Headers для авторизации если нужно
         headers={"X-Scope-OrgID": os.getenv("GRAFANA_TENANT_ID", "1")} if os.getenv("GRAFANA_TENANT_ID") else None
     )
     
-    # BatchSpanProcessor для оптимальной производительности
+    # BatchSpanProcessor для производительности
     trace_processor = BatchSpanProcessor(
         otlp_trace_exporter,
-        # Настройки батчинга согласно CNCF рекомендациям
         max_queue_size=2048,
         max_export_batch_size=512,
         schedule_delay_millis=5000,
@@ -77,7 +77,7 @@ def setup_tracing(app) -> None:
         schedule_delay_millis=5000,
     )
     log_provider.add_log_record_processor(log_processor)
-    logs.set_logger_provider(log_provider)
+    set_logger_provider(log_provider)
     
     # Подключаем OpenTelemetry handler к root logger
     handler = LoggingHandler(
@@ -85,14 +85,13 @@ def setup_tracing(app) -> None:
         logger_provider=log_provider
     )
     
-    # Получаем root logger и добавляем handler
+    # Настройка логирования
     root_logger = logging.getLogger()
+    root_logger.setLevel(logging.INFO)
     root_logger.addHandler(handler)
     
-    # Устанавливаем формат для консольного вывода
-    # В production используем JSON формат для парсинга
+    # JSON logging для production
     if os.getenv("ENVIRONMENT") == "production":
-        # JSON logging для production
         import json
         class JSONFormatter(logging.Formatter):
             def format(self, record):
@@ -104,7 +103,7 @@ def setup_tracing(app) -> None:
                     "pathname": record.pathname,
                     "lineno": record.lineno,
                 }
-                # Добавляем trace context если есть
+                # Добавляем trace context
                 span = trace.get_current_span()
                 if span.is_recording():
                     ctx = span.get_span_context()
@@ -112,22 +111,22 @@ def setup_tracing(app) -> None:
                     log_obj["span_id"] = format(ctx.span_id, '016x')
                 return json.dumps(log_obj)
         
-        json_handler = logging.StreamHandler()
-        json_handler.setFormatter(JSONFormatter())
-        root_logger.addHandler(json_handler)
+        console_handler = logging.StreamHandler()
+        console_handler.setFormatter(JSONFormatter())
+        root_logger.addHandler(console_handler)
     else:
-        # Человекочитаемый формат для dev окружения
-        logging.basicConfig(
-            level=logging.INFO,
-            format='%(asctime)s - %(name)s - %(levelname)s - [%(trace_id)s] - %(message)s',
-            force=True
+        # Human-readable для dev
+        console_handler = logging.StreamHandler()
+        console_handler.setFormatter(
+            logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
         )
+        root_logger.addHandler(console_handler)
     
-    # FastAPI instrumentation с дополнительными атрибутами
+    # FastAPI instrumentation
     FastAPIInstrumentor().instrument_app(
         app, 
         tracer_provider=provider,
-        # Добавляем кастомные атрибуты к спанам
+        # Кастомные атрибуты
         server_request_hook=lambda span, scope: span.set_attributes({
             "http.url.path": scope.get("path"),
             "http.url.query": scope.get("query_string", b"").decode(),
@@ -135,7 +134,7 @@ def setup_tracing(app) -> None:
         })
     )
     
-    # Логируем успешную инициализацию
+    # Log успешной инициализации
     logger = logging.getLogger(__name__)
     logger.info(
         "OpenTelemetry initialized",

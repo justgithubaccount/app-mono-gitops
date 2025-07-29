@@ -35,7 +35,7 @@ spec:
               encoding:
                 codec: json
               labels:
-                app: "{{ host }}"
+                app: "{{`{{ host }}`}}"
                 env: "dev"
   destination:
     name: CLUSTER

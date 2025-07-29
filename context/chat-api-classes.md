@@ -68,7 +68,7 @@ class BehaviorDefinition(BaseModel):
 
 * Основная бизнес-логика:
 
-  * вызывает LLM (`LLMClient`),
+  * вызывает LLM (`OpenRouterClient`),
   * логирует события (через `enrich_context`),
   * оборачивает ошибки и выводит метки (`job=chat`, `trace_id`).
 
@@ -76,7 +76,7 @@ class BehaviorDefinition(BaseModel):
 
 ## 🧬 Слой: `core`
 
-### `LLMClient`
+### `OpenRouterClient`
 
 * Асинхронный HTTP-клиент (httpx), вызывает `/chat/completions` на LiteLLM/LLM API.
 * Поддерживает `project_id`, `user_api_key`, `trace_id`.

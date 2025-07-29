@@ -2,7 +2,7 @@ from typing import List, Optional
 import time
 
 from ..schemas import Message
-from ..core.llm_client import LLMClient
+from ..core.llm_client import OpenRouterClient  
 from app.logger import enrich_context  # логгер с контекстом
 
 class ChatService:
@@ -10,8 +10,8 @@ class ChatService:
     ChatService инкапсулирует бизнес-логику чата.
     """
 
-    def __init__(self, llm_client: LLMClient = None):
-        self.llm_client = llm_client or LLMClient()
+    def __init__(self, llm_client: OpenRouterClient = None):
+        self.llm_client = llm_client or OpenRouterClient()
         enrich_context(event="chat_service_init").info("Chat service initialized")
 
     async def get_ai_reply(

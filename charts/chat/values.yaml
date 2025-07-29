@@ -44,4 +44,10 @@ env:
 secretsRefName: "chat-api-secrets"
 dbSecretRefName: ""
 
+secrets:
+  openRouterApiKey: ""
+  llmApiUrl: "https://openrouter.ai/api/v1"
+  chatModel: "anthropic/claude-opus-4"
+  projectName: "ChatMicroservice"
+
 namespace: "chat-api"

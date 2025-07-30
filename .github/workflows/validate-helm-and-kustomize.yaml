@@ -34,7 +34,7 @@ jobs:
             --namespace chat-${{ matrix.env }} > rendered.yaml
 
       - name: Dry-run Kubernetes apply
-        run: kubectl apply --dry-run=client -f rendered.yaml
+        run: kubectl apply --dry-run=client --validate=false -f rendered.yaml
 
       - name: Kubeconform schema validation
         run: kubeconform -summary -strict rendered.yaml

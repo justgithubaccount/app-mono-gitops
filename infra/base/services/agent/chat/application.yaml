@@ -14,12 +14,7 @@ spec:
     helm:
       valueFiles:
         - values.yaml  # Дефолтные values из чарта
-      values: |
-        image:
-          tag: latest
-        env:
-          OTEL_SERVICE_NAME: "chat-api"
-          OTEL_EXPORTER_OTLP_ENDPOINT: "http://vector-gateway.observability.svc.cluster.local:4318"
+        - ../../infra/clusters/dev/chat-values.yaml  # overlay для dev
   destination:
     name: CLUSTER  # Будет заменено Kustomize
     namespace: chat-api

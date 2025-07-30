@@ -1,4 +1,4 @@
-# Override values для dev окружения
+# override values для dev окружения
 replicaCount: 1
 
 image:
@@ -8,6 +8,14 @@ env:
   ENVIRONMENT: "development"
   LOG_LEVEL: "DEBUG"
   OTEL_SERVICE_NAME: "chat-api-dev"
+  OTEL_EXPORTER_OTLP_ENDPOINT: "http://vector-gateway.observability.svc.cluster.local:4318"
+  OTEL_EXPORTER_OTLP_PROTOCOL: "http/protobuf"
+  OTEL_TRACES_EXPORTER: "otlp"
+  OTEL_LOGS_EXPORTER: "otlp"
+
+openrouter:
+  apiUrl: "https://openrouter.ai/api/v1/chat/completions"
+  defaultModel: "anthropic/claude-opus-4"
 
 resources:
   requests:

@@ -2,9 +2,6 @@ package kubernetes
 
 import rego.v1
 
-# Используем set-based подход (рекомендуется)
-deny := set()
-
 # 🛡️ 1. Контейнеры должны иметь ресурсы
 deny contains msg if {
   input.kind == "Deployment"

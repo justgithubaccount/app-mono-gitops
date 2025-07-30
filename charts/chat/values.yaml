@@ -1,7 +1,7 @@
 # charts/chat/values.yaml
 
 # === Основные настройки приложения ===
-replicaCount: 1
+replicaCount: 2
 namespace: "chat-api"
 
 # === Docker образ ===

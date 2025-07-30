@@ -13,8 +13,7 @@ spec:
   template:
     metadata:
       labels:
-        {{- include "chat-api.selectorLabels" . | nindent 8 }}
-          metadata:
+        {{- include "chat-api.selectorLabels" . | nindent 8 }}  
       annotations:
         openrouter.model: {{ .Values.openrouter.defaultModel | quote }}
     spec:

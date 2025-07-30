@@ -2,7 +2,8 @@ package kubernetes
 
 import rego.v1
 
-default deny := []
+# Используем set-based подход (рекомендуется)
+deny := set()
 
 # 🛡️ 1. Контейнеры должны иметь ресурсы
 deny contains msg if {

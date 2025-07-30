@@ -1,0 +1,10 @@
+{
+    "language": "typescript",
+    "app": "npx ts-node main.ts",
+    "terraformProviders": [
+      "tf.timeweb.cloud/timeweb-cloud/timeweb-cloud@~> 1.0.0"
+    ],
+    "terraformModules": [],
+    "codeMakerOutput": ".gen"
+  }
+  

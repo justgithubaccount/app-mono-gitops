@@ -1,0 +1,9 @@
+{
+    "language": "go",
+    "app": "go run main.go",
+    "terraformProviders": [
+      "tf.timeweb.cloud/timeweb-cloud/timeweb-cloud@~> 1.0.0"
+    ],
+    "codeMakerOutput": ".gen"
+  }
+  

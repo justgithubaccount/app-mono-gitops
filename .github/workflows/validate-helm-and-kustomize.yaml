@@ -32,18 +32,46 @@ jobs:
             --values charts/chat/values.yaml \
             --values infra/clusters/${{ matrix.env }}/chat-values.yaml \
             --namespace chat-${{ matrix.env }} > rendered.yaml
-
+      
+      - name: Save rendered manifest as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: rendered-manifest
+          path: rendered.yaml
+          
       # - name: Dry-run Kubernetes apply
       #  run: kubectl apply --dry-run=client --validate=false -f rendered.yaml
 
       - name: Kubeconform schema validation
         run: kubeconform -summary -strict rendered.yaml
 
+      # - name: OPA policy check
+      #   run: |
+      #     result=$(opa eval -f pretty -d policies/ -i rendered.yaml "data.kubernetes.deny[msg]")
+      #     echo "$result"
+      #     if echo "$result" | grep -q "msg"; then
+      #       echo "❌ OPA policy violations found"
+      #       exit 1
+      #     fi
+
       - name: OPA policy check
         run: |
           result=$(opa eval -f pretty -d policies/ -i rendered.yaml "data.kubernetes.deny[msg]")
           echo "$result"
+          
           if echo "$result" | grep -q "msg"; then
             echo "❌ OPA policy violations found"
+      
+            echo "⛔ Problem fragment:"
+            # Пытаемся вытащить первое сообщение
+            line=$(grep -n "$(echo "$result" | grep msg | cut -d':' -f2 | head -n1 | xargs)" rendered.yaml | cut -d':' -f1 | head -n1)
+            if [ -n "$line" ]; then
+              start=$((line-10))
+              [ "$start" -lt 1 ] && start=1
+              end=$((line+10))
+              sed -n "${start},${end}p" rendered.yaml
+            fi
+      
             exit 1
           fi
+      

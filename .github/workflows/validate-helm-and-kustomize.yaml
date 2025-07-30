@@ -36,7 +36,7 @@ jobs:
       - name: Save rendered manifest as artifact
         uses: actions/upload-artifact@v4
         with:
-          name: rendered-manifest
+          name: rendered-manifest-${{ github.run_number }}
           path: rendered.yaml
           
       # - name: Dry-run Kubernetes apply
@@ -56,14 +56,19 @@ jobs:
 
       - name: OPA policy check
         run: |
+          echo "🔎 Evaluating OPA policies..."
+          opa eval -f pretty -d policies/ -i rendered.yaml "data.kubernetes.deny[msg]" || {
+            echo "❌ OPA crashed (syntax or data issue)"
+            exit 2
+          }
+
           result=$(opa eval -f pretty -d policies/ -i rendered.yaml "data.kubernetes.deny[msg]")
           echo "$result"
-          
+
           if echo "$result" | grep -q "msg"; then
             echo "❌ OPA policy violations found"
-      
+
             echo "⛔ Problem fragment:"
-            # Пытаемся вытащить первое сообщение
             line=$(grep -n "$(echo "$result" | grep msg | cut -d':' -f2 | head -n1 | xargs)" rendered.yaml | cut -d':' -f1 | head -n1)
             if [ -n "$line" ]; then
               start=$((line-10))
@@ -71,7 +76,6 @@ jobs:
               end=$((line+10))
               sed -n "${start},${end}p" rendered.yaml
             fi
-      
+
             exit 1
           fi
-      

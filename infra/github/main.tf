@@ -32,7 +32,7 @@ resource "github_branch_protection" "main" {
   # allows_deletions = false
 
   # Требовать, чтобы админы тоже подчинялись защите:
-  # enforce_admins = true
+  enforce_admins = true
 
   # Обязательные CI-проверки перед мержем:
   # required_status_checks {

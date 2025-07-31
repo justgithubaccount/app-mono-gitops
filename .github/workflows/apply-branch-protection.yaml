@@ -1,0 +1,42 @@
+name: Apply Branch Protection via Terraform
+
+on:
+  push:
+    paths:
+      - 'infra/github/**'
+
+jobs:
+  apply-branch-protection:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Restore Terraform state from cache
+        uses: actions/cache@v3
+        with:
+          path: infra/github/terraform.tfstate
+          key: terraform-state-${{ github.ref }}
+          restore-keys: |
+            terraform-state-
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Init & Apply
+        env:
+          TF_VAR_github_token: ${{ secrets.GH_ADMIN_TOKEN }}
+          TF_VAR_github_owner: justgithubaccount
+        run: |
+          cd infra/github
+          terraform init
+          terraform apply -auto-approve
+
+      - name: Save updated Terraform state to cache
+        uses: actions/cache/save@v3
+        with:
+          path: infra/github/terraform.tfstate
+          key: terraform-state-${{ github.ref }}

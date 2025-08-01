@@ -11,4 +11,4 @@ spec:
     - port: {{ .Values.service.port | default 80 }}
       targetPort: {{ .Values.containerPort | default 8000 }}
   selector:
-    app: {{ include "chat-api.name" . }}
+    {{- include "chat-api.selectorLabels" . | nindent 4 }}

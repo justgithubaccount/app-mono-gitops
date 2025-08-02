@@ -33,3 +33,4 @@ notion-client==2.2.1
 # Utils
 python-dotenv==1.0.1
 tenacity==9.0.0
+types-PyYAML = "^6.0.12"

@@ -154,7 +154,11 @@ class OpenRouterClient:
                         "response_body": e.response.text[:500]  # Первые 500 символов
                     }
                 )
-                raise
+                # Возвращаем error response вместо raise
+                return {
+                    "error": f"HTTP {e.response.status_code}: {str(e)}",
+                    "choices": [{"message": {"content": f"HTTP ошибка: {e.response.status_code}"}}]
+                }
                 
             except Exception as e:
                 # Обработка других ошибок
@@ -177,8 +181,11 @@ class OpenRouterClient:
                         "exception.message": str(e)
                     }
                 )
-# apps/chat/app/core/llm_client.py
-# В конец класса OpenRouterClient добавь:
+                # Возвращаем error response вместо raise
+                return {
+                    "error": str(e),
+                    "choices": [{"message": {"content": f"Ошибка: {str(e)}"}}]
+                }
 
     async def generate_reply(
         self,
@@ -230,6 +237,10 @@ class OpenRouterClient:
                 model=self.default_model
             )
             
+            # Проверяем на ошибки
+            if "error" in response:
+                return f"Ошибка API: {response['error']}"
+            
             # Извлекаем текст ответа
             return response["choices"][0]["message"]["content"]
             
@@ -237,8 +248,6 @@ class OpenRouterClient:
             # Восстанавливаем оригинальный ключ
             if user_api_key:
                 self.api_key = original_key
-        # Fallback return для MyPy
-        return "Ошибка: не удалось получить ответ"
     
     @property
     def model_name(self) -> str:

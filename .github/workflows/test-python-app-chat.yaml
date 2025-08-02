@@ -22,6 +22,8 @@ jobs:
           pip install -r requirements.txt
           pip install pytest pytest-asyncio pytest-cov mypy ruff
       - name: Run tests
+        env:
+          OTEL_SDK_DISABLED: true
         run: |
           export PYTHONPATH=.
           pytest --cov=app tests/

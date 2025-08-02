@@ -1,5 +1,5 @@
-# tests/conftest.py
 import pytest
+from unittest.mock import AsyncMock
 from fastapi.testclient import TestClient
 from app.main import create_app
 
@@ -9,6 +9,11 @@ def client():
     return TestClient(app)
 
 @pytest.fixture
-def sample_message():
-    from app.schemas import Message
-    return Message(role="user", content="test")
+def mock_openrouter(monkeypatch):
+    async def mock_generate_reply(*args, **kwargs):
+        return "Mocked response from AI"
+    
+    monkeypatch.setattr(
+        "app.core.llm_client.OpenRouterClient.generate_reply", 
+        mock_generate_reply
+    )

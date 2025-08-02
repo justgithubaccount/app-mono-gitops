@@ -107,9 +107,11 @@ def setup_tracing(app) -> None:
                 span = trace.get_current_span()
                 if span.is_recording():
                     ctx = span.get_span_context()
-                    log_obj["trace_id"] = format(ctx.trace_id, '032x')
-                    log_obj["span_id"] = format(ctx.span_id, '016x')
-                return json.dumps(log_obj)
+                    # Приводим к нужным типам для MyPy
+                    trace_id: int = ctx.trace_id
+                    span_id: int = ctx.span_id
+                    log_obj["trace_id"] = format(trace_id, '032x')
+                    log_obj["span_id"] = format(span_id, '016x')
         
         console_handler = logging.StreamHandler()
         console_handler.setFormatter(JSONFormatter())

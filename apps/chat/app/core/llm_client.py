@@ -237,6 +237,8 @@ class OpenRouterClient:
             # Восстанавливаем оригинальный ключ
             if user_api_key:
                 self.api_key = original_key
+        # Fallback return для MyPy
+        return "Ошибка: не удалось получить ответ"
     
     @property
     def model_name(self) -> str:

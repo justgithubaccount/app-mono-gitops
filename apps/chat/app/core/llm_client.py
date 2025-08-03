@@ -92,7 +92,7 @@ class OpenRouterClient:
                 span.set_attribute("llm.request_size", request_size)
                 
                 # Создаем отдельный span для HTTP запроса
-                with tracer.start_as_current_span("http_request") as http_span:
+                with tracer.start_as_current_span("http_request"):
                     async with httpx.AsyncClient() as client:
                         response = await client.post(
                             self.api_url,
@@ -154,7 +154,11 @@ class OpenRouterClient:
                         "response_body": e.response.text[:500]  # Первые 500 символов
                     }
                 )
-                raise
+                # Возвращаем error response вместо raise
+                return {
+                    "error": f"HTTP {e.response.status_code}: {str(e)}",
+                    "choices": [{"message": {"content": f"HTTP ошибка: {e.response.status_code}"}}]
+                }
                 
             except Exception as e:
                 # Обработка других ошибок
@@ -177,8 +181,11 @@ class OpenRouterClient:
                         "exception.message": str(e)
                     }
                 )
-# apps/chat/app/core/llm_client.py
-# В конец класса OpenRouterClient добавь:
+                # Возвращаем error response вместо raise
+                return {
+                    "error": str(e),
+                    "choices": [{"message": {"content": f"Ошибка: {str(e)}"}}]
+                }
 
     async def generate_reply(
         self,
@@ -229,6 +236,10 @@ class OpenRouterClient:
                 messages=openrouter_messages,
                 model=self.default_model
             )
+            
+            # Проверяем на ошибки
+            if "error" in response:
+                return f"Ошибка API: {response['error']}"
             
             # Извлекаем текст ответа
             return response["choices"][0]["message"]["content"]

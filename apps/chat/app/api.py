@@ -1,7 +1,7 @@
-from fastapi import APIRouter, HTTPException, status, Depends, Request
+from fastapi import APIRouter, HTTPException, Depends, Request
 from datetime import datetime
 from .schemas import (
-    ChatRequest, ChatResponse, Message,
+    ChatRequest, ChatResponse,
     CreateProjectRequest, ProjectInfo,
 )
 from .models import ChatHistory, StoredChatMessage
@@ -63,6 +63,7 @@ async def chat_endpoint(
     except Exception as e:
         log.bind(event="chat_api_error", error=str(e)).error("Standard chat request failed")
         traceback.print_exc()
+        # raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="...")
         raise HTTPException(status_code=500, detail="AI сервис недоступен")
 
 @api_router.post("/projects", response_model=ProjectInfo)

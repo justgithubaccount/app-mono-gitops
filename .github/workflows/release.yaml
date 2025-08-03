@@ -1,0 +1,62 @@
+name: Build and Release
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'apps/chat/**'
+      - '.github/workflows/release.yaml'
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+         
+      # 1. Semantic Release (создает версию)
+      - name: Semantic Release
+        id: semantic
+        uses: cycjimmy/semantic-release-action@v4
+        with:
+          semantic_version: 21
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          
+      # 1.5. Обновить Chart.yaml и упаковать Helm
+      - name: Install Helm
+        if: steps.semantic.outputs.new_release_published == 'true'
+        uses: azure/setup-helm@v3
+        
+      - name: Update Chart Version
+        if: steps.semantic.outputs.new_release_published == 'true'
+        run: |
+          VERSION=${{ steps.semantic.outputs.new_release_version }}
+          sed -i "s/^version:.*/version: $VERSION/" charts/chat/Chart.yaml
+          sed -i "s/^appVersion:.*/appVersion: \"$VERSION\"/" charts/chat/Chart.yaml
+          
+      - name: Package Helm Chart
+        if: steps.semantic.outputs.new_release_published == 'true'
+        run: helm package charts/chat --destination ./
+         
+      # 2. Docker build с версией
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+         
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./apps/chat
+          push: true
+          tags: |
+            ghcr.io/justgithubaccount/chat-api:latest
+            ghcr.io/justgithubaccount/chat-api:${{ github.sha }}
+            ${{ steps.semantic.outputs.new_release_version && format('ghcr.io/justgithubaccount/chat-api:{0}', steps.semantic.outputs.new_release_version) || '' }}

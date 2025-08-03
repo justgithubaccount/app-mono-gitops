@@ -92,7 +92,7 @@ class OpenRouterClient:
                 span.set_attribute("llm.request_size", request_size)
                 
                 # Создаем отдельный span для HTTP запроса
-                with tracer.start_as_current_span("http_request") as http_span:
+                with tracer.start_as_current_span("http_request")
                     async with httpx.AsyncClient() as client:
                         response = await client.post(
                             self.api_url,

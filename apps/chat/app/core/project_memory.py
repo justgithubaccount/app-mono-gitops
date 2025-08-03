@@ -1,5 +1,5 @@
 from typing import Dict, List, Optional
-from app.schemas import ProjectInfo, CreateProjectRequest
+from app.schemas import ProjectInfo
 from app.models import ChatHistory, StoredChatMessage
 from uuid import uuid4
 

@@ -1,6 +1,6 @@
 import logging
 from contextvars import ContextVar
-from typing import Any, Dict, Optional, cast
+from typing import Any, Dict, cast
 from opentelemetry import trace
 import structlog
 

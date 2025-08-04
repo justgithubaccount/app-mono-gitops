@@ -6,7 +6,12 @@
     [
       "@semantic-release/github",
       {
-        "assets": ["chat-*.tgz"]
+        "assets": [
+          {
+            "path": "chat-*.tgz",
+            "label": "Helm Chart"
+          }
+        ]
       }
     ]
   ]

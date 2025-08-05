@@ -17,6 +17,7 @@ resources:
 #  - ../../base/addons/consul
   - ../../base/addons/external-secrets
   - ../../base/addons/observability/vector-gateway
+  - ../../base/addons/argocd-image-updater
 
 patches:
   # Override .spec.destination.name

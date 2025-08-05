@@ -8,7 +8,7 @@ namespace: "chat-api"
 image:
   repository: ghcr.io/justgithubaccount/chat-api
   pullPolicy: Always
-  tag: "latest"
+  tag: "1.0.0"
 
 # === Сетевые настройки ===
 containerPort: 8000

@@ -28,67 +28,18 @@ jobs:
           dry_run: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          
-      # Early exit если нет новой версии
-      - name: Skip if no release
-        if: '!steps.version.outputs.new_release_version'
-        run: echo "No new version to release, skipping..." && exit 0
          
-      # 2. Обновляем Chart.yaml и создаем helm архив ПЕРЕД релизом
-      - name: Install Helm
-        if: steps.version.outputs.new_release_version
-        uses: azure/setup-helm@v4
-        
-      - name: Configure Git
-        if: steps.version.outputs.new_release_version
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-       
-      - name: Update Chart Version and Package
-        if: steps.version.outputs.new_release_version
-        run: |
-          VERSION=${{ steps.version.outputs.new_release_version }}
-         
-          # Проверяем что Chart.yaml существует
-          if [[ ! -f charts/chat/Chart.yaml ]]; then
-            echo "Error: charts/chat/Chart.yaml not found!"
-            exit 1
-          fi
-         
-          # Обновляем Chart.yaml
-          sed -i "s/^version:.*/version: $VERSION/" charts/chat/Chart.yaml
-          sed -i "s/^appVersion:.*/appVersion: \"$VERSION\"/" charts/chat/Chart.yaml
-         
-          # Проверяем что изменения применились
-          echo "Updated Chart.yaml:"
-          grep -E '^(version|appVersion):' charts/chat/Chart.yaml
-         
-          # Пакуем Helm chart
-          helm package charts/chat --destination ./
-          
-          # Проверяем что архив создался
-          ls -la chat-*.tgz
-         
-          # Коммитим обратно в git (для ArgoCD)
-          git add charts/chat/Chart.yaml
-          if git diff --staged --quiet; then
-            echo "No changes to commit"
-          else
-            git commit -m "chore: update chart version to $VERSION [skip ci]"
-            git push
-          fi
-         
-      # 3. Создаем релиз с готовым helm архивом
+      # 2. Создаем релиз (только если есть новая версия)
       - name: Semantic Release
         id: semantic
+        if: steps.version.outputs.new_release_version
         uses: cycjimmy/semantic-release-action@v4
         with:
           semantic_version: 21
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
          
-      # 4. Docker build с версией
+      # 3. Docker build с версией (только если релиз создан)
       - name: Log in to GitHub Container Registry
         if: steps.semantic.outputs.new_release_published == 'true'
         uses: docker/login-action@v3
@@ -107,6 +58,5 @@ jobs:
             ghcr.io/justgithubaccount/chat-api:latest
             ghcr.io/justgithubaccount/chat-api:${{ github.sha }}
             ghcr.io/justgithubaccount/chat-api:${{ steps.semantic.outputs.new_release_version }}
-          # Добавляем кэширование для ускорения
           cache-from: type=gha
           cache-to: type=gha,mode=max

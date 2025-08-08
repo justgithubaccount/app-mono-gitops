@@ -29,9 +29,9 @@
 ### ci
 - [x] Добаваить тестов на предмет хелм рендеринда конфигов | добавить opa политики  
 - [x] Добавить [семантическое версионирование](https://semver.org/lang/ru/) + git-теги + хелм-релиз-логика
-  - [ ] Добавить argocd-image-updater  
+  - [x] Добавить argocd-image-updater  
   - [ ] Тестить сборку релиза перед мерджем, в самом pr  
-  - [ ] сonventional сommits | всё в .releaserc.json | встроить флоу для гита  
+  - [x] сonventional сommits | всё в .releaserc.json | встроить флоу для гита  
 ### mesh
 - [ ] Добавить сервис по анализу [инцидентов](https://github.com/justgithubaccount/app-release/issues/5)
 - [ ] Продумать концепцию нейминга как под saas сервис

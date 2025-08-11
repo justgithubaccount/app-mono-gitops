@@ -60,10 +60,10 @@ GitOps составляющая взята из подкаста [DKT66 - Что
 Установить в новый кластер с нуля с восстановлением всех ресов кластера на основе роли (секреты нужно обновить)  
 ```bash
 kubectl create namespace argocd  
-kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml  
+kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/v3.0.12/manifests/ha/install.yaml  
 git clone https://github.com/justgithubaccount/app-release.git  
 cd app-release  
-kubectl apply -f infra/_roles/role-dev-enviroment.yaml  
+kubectl apply -f infra/roles/role-dev-enviroment.yaml  
 ```
 ---
 То что дальше требует обновления, но +/- так оно и есть, тесты, да нужно, накинуть...

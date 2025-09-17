@@ -69,10 +69,9 @@ externalServices:
     host: ""
     port: 5432
 
-# === Secrets ===
-# Имя внешнего секрета с OPENROUTER_API_KEY
-secretsRefName: "chat-api-secrets"
-dbSecretRefName: "chat-api-db"
+# Secrets
+openrouterSecretRefName: "chat-openrouter"
+postgresSecretRefName: "chat-postgres"
 
 # PostgreSQL
 postgres:

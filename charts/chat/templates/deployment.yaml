@@ -72,12 +72,12 @@ spec:
                   
           envFrom:
             - secretRef:
-                name: {{ .Values.secretsRefName | default "chat-api-secrets" }}
-            {{- if .Values.dbSecretRefName }}
+                name: {{ .Values.openrouterSecretRefName | default "chat-openrouter" }}
+            {{- if .Values.postgresSecretRefName }}
             - secretRef:
-                name: {{ .Values.dbSecretRefName }}
+                name: {{ .Values.postgresSecretRefName }}
             {{- end }}
-            
+                      
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
             

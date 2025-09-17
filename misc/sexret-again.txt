@@ -1,31 +1,13 @@
-kubectl create secret generic cloudflare-external-dns-api-token \
-  --from-literal=api-token="b0tk77P9TSmACy4-dOto25mJVepVXHN2FbJbmtF-" \
-  --namespace=external-dns \
-  --dry-run=client -o json | \
-kubeseal --controller-name=sealed-secrets --controller-namespace=kube-system --format yaml > secret-cloudflare-external-dns-sealed.yaml
+# kubeseal
+wget https://github.com/bitnami-labs/sealed-secrets/releases/download/v0.32.2/kubeseal-0.32.2-linux-amd64.tar.gz
+tar -xvzf kubeseal-0.32.2-linux-amd64.tar.gz
+sudo install -m 755 kubeseal /usr/local/bin/kubeseal
 
-kubectl create secret generic cloudflare-cert-manager-api-token \
-  --from-literal=api-token="b0tk77P9TSmACy4-dOto25mJVepVXHN2FbJbmtF-" \
-  --namespace=cert-manager \
-  --dry-run=client -o json | \
-kubeseal --controller-name=sealed-secrets --controller-namespace=kube-system --format yaml > secret-cloudflare-cert-manager-sealed.yaml
-
-kubectl create secret generic litellm-secrets \
-  --from-literal=api-token="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" \
-  --namespace=chat-api \
-  --dry-run=client -o json | \
-kubeseal --controller-name=sealed-secrets --controller-namespace=kube-system --format yaml > litellm-secrets-sealed.yaml
-
-kubectl create secret generic chat-api-db \
-  --from-literal=DATABASE_URL="postgresql://gen_user:%26P_6Z2*icPBw%3C%3C@192.168.0.8:5432/chat_api" \
-  --namespace=chat-api \
-  --dry-run=client -o json | \
-kubeseal --controller-name=sealed-secrets --controller-namespace=kube-system --format yaml > pg-secrets-sealed.yaml
-
+### Chat Application
 
 # OpenRouter
 kubectl create secret generic chat-openrouter \
-  --from-literal=OPENROUTER_API_KEY="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" \
+  --from-literal=OPENROUTER_API_KEY="sk-or-v1-30895..." \
   --namespace=chat-api \
   --dry-run=client -o json | \
 kubeseal --controller-name=sealed-secrets --controller-namespace=kube-system \
@@ -33,7 +15,7 @@ kubeseal --controller-name=sealed-secrets --controller-namespace=kube-system \
 
 # DB
 kubectl create secret generic chat-postgree \
-  --from-literal=DATABASE_URL="postgresql://gen_user:%26P_6Z2*icPBw%3C%3C@192.168.0.8:5432/chat_api" \
+  --from-literal=DATABASE_URL="postgresql://gen_user:********@192.168.0.6:5432/chat-api" \
   --namespace=chat-api \
   --dry-run=client -o json | \
 kubeseal --controller-name=sealed-secrets --controller-namespace=kube-system \
@@ -41,8 +23,26 @@ kubeseal --controller-name=sealed-secrets --controller-namespace=kube-system \
 
 # GitHub (argo-image-updater)
 kubectl create secret generic chat-github  \
-  --from-literal=DATABASE_URL="postgresql://gen_user:%26P_6Z2*icPBw%3C%3C@192.168.0.8:5432/chat_api" \
-  --namespace=chat-api \
+  --from-literal=GITHUB_TOKEN="ghp_pa8ow..." \
+  --namespace=argocd \
   --dry-run=client -o json | \
 kubeseal --controller-name=sealed-secrets --controller-namespace=kube-system \
   --format yaml > infra/base/services/agent/chat/github-secrets.yaml
+
+### Auto certs with dns (same token)
+
+# Certmanager
+kubectl create secret generic cert-manager-secret  \
+  --from-literal=CLOUDFLARE_TOKEN="PPVVv..." \
+  --namespace=cert-manager \
+  --dry-run=client -o json | \
+kubeseal --controller-name=sealed-secrets --controller-namespace=kube-system \
+  --format yaml > infra/base/addons/cert-manager/cloudflare-secrets.yaml
+
+# Cloudflare
+kubectl create secret generic external-dns-secret  \
+  --from-literal=CLOUDFLARE_TOKEN="PPVVv..." \
+  --namespace=external-dns \
+  --dry-run=client -o json | \
+kubeseal --controller-name=sealed-secrets --controller-namespace=kube-system \
+  --format yaml > infra/base/addons/external-dns/cloudflare-secrets.yaml

@@ -71,7 +71,7 @@ externalServices:
 
 # Secrets
 openrouterSecretRefName: "chat-openrouter"
-postgresSecretRefName: "chat-postgres"
+postgresSecretRefName: "chat-postgree"
 
 # PostgreSQL
 postgres:

@@ -12,7 +12,7 @@
           {"type": "docs", "release": "patch"},
           {"type": "style", "release": "patch"},
           {"type": "refactor", "release": "patch"},
-          {"type": "tst-app", "release": "patch"},
+          {"type": "tst", "release": "patch"},
           {"type": "tst-cd", "release": "patch"},
           {"type": "tst-ci", "release": "patch"},
           {"type": "ci", "release": "patch"},

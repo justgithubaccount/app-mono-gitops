@@ -29,6 +29,18 @@ kubectl create secret generic chat-github  \
 kubeseal --controller-name=sealed-secrets --controller-namespace=kube-system \
   --format yaml > infra/base/services/agent/chat/github-secrets.yaml
 
+# True Creds for Argo Image Updater
+kubectl create secret generic chat-github \
+  --namespace=argocd \
+  --from-literal=url=https://github.com/justgithubaccount/app-release \
+  --from-literal=username=justgithubaccount \
+  --from-literal=password=ghp_PpwlZ... \
+  --dry-run=client -o json | \
+jq '.metadata.labels["argocd.argoproj.io/secret-type"]="repository"' | \
+kubeseal --controller-name=sealed-secrets \
+  --controller-namespace=kube-system \
+  --format yaml > infra/base/services/agent/chat/github-secrets.yaml
+
 ### Auto certs with dns (same token)
 
 # Certmanager

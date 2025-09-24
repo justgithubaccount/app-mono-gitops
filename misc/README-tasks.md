@@ -33,3 +33,5 @@
   - [ ] [mesh] Создать отдельный сервис через cdktf, чтобы инфра сама себя воспроизводила (всм как бы добавить терраформа, но через питон) 
 ### obs
   - [ ] отдать в локи, лог смены версии kubectl -n argocd logs -l app.kubernetes.io/name=argocd-image-updater --tail=200
+  - [ ] отдать в локи по аналогии, данные со всех сущностей арго kubectl logs -n argocd deploy/argocd-server, kubectl logs -n argocd statefulset/argocd-application-controller, kubectl get pods -n argocd -l app.kubernetes.io/name=argocd-redis
+  - [ ] отдать все данные в локи, о всех сервисах системы, чтобы это было привязанно в локи по лейблу | один лейбл = один сервис | автоматизировать | где-то был контролер который это делает все из коробки  

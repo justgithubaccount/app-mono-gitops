@@ -1,0 +1,14 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: chat-api
+  description: Chat API powering conversational experiences
+  annotations:
+    backstage.io/kubernetes-id: chat-api
+    grafana/dashboard-selector: (tags @> 'chat-api')
+    prometheus.io/rule: sum(rate(http_requests_total{service="chat-api"}[5m]))
+spec:
+  type: service
+  owner: team-llm
+  lifecycle: production
+  system: chat-platform

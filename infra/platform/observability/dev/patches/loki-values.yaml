@@ -1,0 +1,10 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: loki
+spec:
+  source:
+    helm:
+      valueFiles:
+        - infra/platform/values/observability/loki/base.yaml
+        - infra/platform/values/observability/loki/dev.yaml

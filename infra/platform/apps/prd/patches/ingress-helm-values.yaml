@@ -1,0 +1,10 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: ingress-nginx
+spec:
+  source:
+    helm:
+      valueFiles:
+        - infra/platform/values/ingress/base.yaml
+        - infra/platform/values/ingress/prd.yaml

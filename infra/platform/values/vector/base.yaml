@@ -1,0 +1,44 @@
+role: Aggregator
+service:
+  enabled: true
+  type: ClusterIP
+  ports:
+    - name: otlp-http
+      port: 4318
+customConfig:
+  data_dir: /vector-data
+  sources:
+    otlp_http:
+      type: otlp
+      protocol:
+        http:
+          listen_address: 0.0.0.0:4318
+  transforms:
+    normalize:
+      type: remap
+      inputs:
+        - otlp_http
+      source: |
+        .service_name = coalesce!(.resource["service.name"], .service_name)
+        .namespace = .resource["k8s.namespace.name"] ?? .kubernetes.namespace_name
+  sinks:
+    loki:
+      type: loki
+      inputs:
+        - normalize
+      endpoint: http://loki-gateway.observability.svc.cluster.local:3100
+      encoding:
+        codec: json
+      labels:
+        service_name: "{{ service_name }}"
+        namespace: "{{ namespace }}"
+    tempo:
+      type: opentelemetry
+      inputs:
+        - normalize
+      endpoint: http://tempo-distributor.observability.svc.cluster.local:4318/v1/traces
+    metrics:
+      type: prometheus_exporter
+      inputs:
+        - normalize
+      address: 0.0.0.0:9100

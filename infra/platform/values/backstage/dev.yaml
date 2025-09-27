@@ -1,0 +1,14 @@
+backstage:
+  appConfig:
+    backend:
+      baseUrl: https://backstage.dev.example.com
+      cors:
+        origin:
+          - https://backstage.dev.example.com
+    app:
+      title: "Developer Portal (dev)"
+  ingress:
+    host: backstage.dev.example.com
+  extraEnvVars:
+    - name: NODE_ENV
+      value: development

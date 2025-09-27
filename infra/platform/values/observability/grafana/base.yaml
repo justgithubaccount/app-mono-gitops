@@ -1,0 +1,24 @@
+adminPassword: admin
+service:
+  type: ClusterIP
+datasources:
+  datasources.yaml:
+    apiVersion: 1
+    datasources:
+      - name: Loki
+        type: loki
+        access: proxy
+        url: http://loki-gateway.observability.svc.cluster.local:3100
+      - name: Tempo
+        type: tempo
+        access: proxy
+        url: http://tempo-query.observability.svc.cluster.local
+      - name: Prometheus
+        type: prometheus
+        access: proxy
+        url: http://prometheus-k8s.observability.svc.cluster.local
+sidecar:
+  dashboards:
+    enabled: true
+    provider:
+      foldersFromFilesStructure: true

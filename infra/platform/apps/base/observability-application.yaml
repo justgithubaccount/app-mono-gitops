@@ -1,14 +1,16 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: infra-root
+  name: observability-stack
   namespace: argocd
+  labels:
+    app.kubernetes.io/part-of: observability
 spec:
   project: platform
   source:
     repoURL: https://github.com/justgithubaccount/app-release.git
     targetRevision: main
-    path: infra/bootstrap
+    path: infra/platform/observability/base
   destination:
     server: https://kubernetes.default.svc
     namespace: argocd
@@ -18,3 +20,4 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
+      - ServerSideApply=true

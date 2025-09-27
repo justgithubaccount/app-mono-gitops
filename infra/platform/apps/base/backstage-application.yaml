@@ -1,0 +1,26 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: backstage
+  namespace: argocd
+  labels:
+    app.kubernetes.io/part-of: developer-portal
+spec:
+  project: platform
+  source:
+    repoURL: https://redhat-developer.github.io/rhdh-chart
+    chart: backstage
+    targetRevision: 1.2.0
+    helm:
+      releaseName: backstage
+      valueFiles:
+        - infra/platform/values/backstage/base.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: backstage
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

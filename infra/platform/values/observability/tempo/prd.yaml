@@ -1,0 +1,4 @@
+tempo:
+  metricsGenerator:
+    storage:
+      path: /var/tempo/wal-prd

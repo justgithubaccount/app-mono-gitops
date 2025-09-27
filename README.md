@@ -12,7 +12,7 @@ kubectl create namespace argocd
 kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/v3.0.12/manifests/ha/install.yaml  
 git clone https://github.com/justgithubaccount/app-release.git  
 cd app-release  
-kubectl apply -f infra/roles/role-dev-enviroment.yaml  
+kubectl apply -f infra/infra-root.yaml
 ```
 
 Поднимется API на FastAPI, будут проброшенны вэбки для Argo, Grafana через CloudFlare (ssl + dns), Longhorn. 
@@ -27,11 +27,11 @@ kubectl apply -f infra/roles/role-dev-enviroment.yaml
 
 Изначально все родилось с идеи создать микро-сервисную архитектуру для ии-агента с подключеним CrewAI, но перед этим еще нужно было потестить эко-систему от Арго  
 
-В `apps/` живут сервисы, отвечающие за логические сущности ии-агента и в целом системы  
-В `charts/` соответственно хелм-обертки под эти сервисы  
-В `infra/base/services` соответственно эти сервисы обернуты в `kind` типа `Application`  
+`infra/infra-root.yaml` разворачивает AppProject'ы и App-of-Apps для окружений `dev` и `prd`. Каждый кластер тянет `infra/platform/apps/<env>` — там лежат все платформенные Argo CD Applications (Backstage, ingress, cert-manager, External Secrets, наблюдаемость, Vector).
 
-После применения `infra/roles/role-dev-enviroment.yaml` подхватывается overlay `infra/clusters/dev/kustomization.yaml` для этой роли (можно воспринимать как разрешение, т.е. что будет установленно в кластер), в котором можно посмотреть что будет применно к этому кластеру  
+В `apps/` теперь живут бизнес-сервисы, для примера добавлен Helm chart `apps/chat-api`. В `apps/chat-api/values/` хранятся оверлеи `values-dev.yaml` и `values-prd.yaml`, которые включаются из GitOps-пайплайнов под проектом `apps`.
+
+Вся платформенная конфигурация (ingress, cert-manager, External Secrets, observability, Backstage) вынесена в `infra/platform/values`. Базовые значения лежат в `base.yaml`, а окруженческие корректировки — в `dev.yaml`/`prd.yaml`.
 
 Благодаря GitOps все крайне прозрачно и предусматривает управление любым кол-вом кластеров 100+ 
 

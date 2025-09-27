@@ -1,0 +1,7 @@
+podLabels:
+  platform.argoproj.io/environment: dev
+customConfig:
+  sinks:
+    loki:
+      labels:
+        environment: dev

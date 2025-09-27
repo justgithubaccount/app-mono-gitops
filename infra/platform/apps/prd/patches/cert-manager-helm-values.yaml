@@ -1,0 +1,10 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: cert-manager
+spec:
+  source:
+    helm:
+      valueFiles:
+        - infra/platform/values/cert-manager/base.yaml
+        - infra/platform/values/cert-manager/prd.yaml

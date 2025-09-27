@@ -1,0 +1,10 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: backstage
+spec:
+  source:
+    helm:
+      valueFiles:
+        - infra/platform/values/backstage/base.yaml
+        - infra/platform/values/backstage/prd.yaml

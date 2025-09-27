@@ -1,0 +1,9 @@
+installCRDs: true
+leaderElect: true
+serviceAccount:
+  create: true
+  name: external-secrets
+metrics:
+  enabled: true
+  serviceMonitor:
+    enabled: true

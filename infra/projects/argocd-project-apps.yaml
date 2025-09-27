@@ -1,0 +1,15 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: apps
+  namespace: argocd
+spec:
+  description: Business and product application workloads
+  sourceRepos:
+    - https://github.com/justgithubaccount/app-release.git
+  destinations:
+    - namespace: "*"
+      server: https://kubernetes.default.svc
+  namespaceResourceWhitelist:
+    - group: "*"
+      kind: "*"

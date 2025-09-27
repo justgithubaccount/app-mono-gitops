@@ -1,0 +1,13 @@
+tempo:
+  storage:
+    trace:
+      backend: filesystem
+  metricsGenerator:
+    enabled: true
+  resources:
+    requests:
+      cpu: 200m
+      memory: 512Mi
+    limits:
+      cpu: 1
+      memory: 1Gi

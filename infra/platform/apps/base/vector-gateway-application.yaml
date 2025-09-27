@@ -1,0 +1,27 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: vector-gateway
+  namespace: argocd
+  labels:
+    app.kubernetes.io/part-of: observability
+spec:
+  project: platform
+  source:
+    repoURL: https://helm.vector.dev
+    chart: vector
+    targetRevision: 0.44.0
+    helm:
+      releaseName: vector-gateway
+      valueFiles:
+        - infra/platform/values/vector/base.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: observability
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true

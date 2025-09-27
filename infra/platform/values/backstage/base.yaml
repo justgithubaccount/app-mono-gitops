@@ -1,0 +1,55 @@
+backstage:
+  appConfig:
+    app:
+      title: "Developer Portal"
+    backend:
+      baseUrl: https://backstage.example.com
+      cors:
+        origin:
+          - https://backstage.example.com
+    proxy:
+      "/grafana/api":
+        target: http://grafana.observability.svc.cluster.local
+      "/prometheus/api":
+        target: http://prometheus-k8s.observability.svc.cluster.local
+      "/tempo/api":
+        target: http://tempo-query.observability.svc.cluster.local
+  ingress:
+    enabled: true
+    host: backstage.example.com
+    tls:
+      enabled: true
+  dynamicPlugins:
+    enabled: true
+    plugins:
+      - name: "@backstage/plugin-kubernetes-backend"
+      - name: "@backstage/plugin-grafana-backend"
+      - name: "@backstage/plugin-prometheus-backend"
+      - name: "@backstage/plugin-jaeger-backend"
+  upstream:
+    metrics:
+      serviceMonitor:
+        enabled: true
+        path: /metrics
+  resources:
+    requests:
+      cpu: 250m
+      memory: 512Mi
+    limits:
+      cpu: 1
+      memory: 2Gi
+
+postgresql:
+  enabled: false
+
+database:
+  external:
+    enabled: true
+    host: patroni-pgbouncer.db.svc.cluster.local
+    port: 5432
+    database: backstage
+    user: backstage_user
+
+serviceAccount:
+  annotations:
+    eks.amazonaws.com/role-arn: ""

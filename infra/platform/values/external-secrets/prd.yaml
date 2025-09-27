@@ -1,0 +1,4 @@
+config:
+  logLevel: info
+  leaderElection:
+    namespace: external-secrets

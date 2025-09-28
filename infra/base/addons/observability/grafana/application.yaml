@@ -29,7 +29,10 @@ spec:
     name: CLUSTER
   syncPolicy:
     automated:
+      allowEmpty: true
       selfHeal: true
       prune: true
     syncOptions:
+      - Validate=true
       - CreateNamespace=true
+      - PruneLast=true

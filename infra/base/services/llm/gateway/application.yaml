@@ -15,5 +15,10 @@ spec:
     namespace: chat-api
   syncPolicy:
     automated:
-      prune: true
+      allowEmpty: true
       selfHeal: true
+      prune: true
+    syncOptions:
+      - Validate=true
+      - CreateNamespace=true
+      - PruneLast=true

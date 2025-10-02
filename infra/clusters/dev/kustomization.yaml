@@ -13,8 +13,6 @@ resources:
   - ../../base/addons/observability/loki
   - ../../base/addons/observability/grafana
   - ../../base/services/agent/chat
-#  - ../../base/services/llm/gateway
-#  - ../../base/addons/consul
   - ../../base/addons/external-secrets
   - ../../base/addons/observability/vector-gateway
   - ../../base/addons/argocd-image-updater

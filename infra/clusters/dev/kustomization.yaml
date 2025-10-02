@@ -16,6 +16,7 @@ resources:
   - ../../base/addons/external-secrets
   - ../../base/addons/observability/vector-gateway
   - ../../base/addons/argocd-image-updater
+  - ../../base/addons/open-webui
 
 patches:
   # Override .spec.destination.name

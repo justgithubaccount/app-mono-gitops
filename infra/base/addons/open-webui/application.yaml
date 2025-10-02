@@ -27,7 +27,7 @@ spec:
           tls: true
         env:
           - name: OPENAI_API_KEY
-            value: dummy
+            value: 
           - name: OPENAI_API_BASE
             value: http://chat-api.chat-api.svc.cluster.local:8000/v1
         persistence:

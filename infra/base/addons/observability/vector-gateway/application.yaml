@@ -39,12 +39,12 @@ spec:
               encoding:
                 codec: json
               labels:
-                service_name: "{{`{{ resources.service.name }}`}}"
-                namespace: "{{`{{ resources.k8s.namespace }}`}}"
-                deployment: "{{`{{ resources.k8s.deployment.name }}`}}"
-                container: "{{`{{ resources.k8s.container.name }}`}}"
-                node: "{{`{{ resources.k8s.node.name }}`}}"
-                env: "{{`{{ resources.deployment.environment | default \"dev\" }}`}}"
+                service_name: "{{ resources.service.name }}"
+                namespace: "{{ resources.k8s.namespace }}"
+                deployment: "{{ resources.k8s.deployment.name }}"
+                container: "{{ resources.k8s.container.name }}"
+                node: "{{ resources.k8s.node.name }}"
+                env: "{{ resources.deployment.environment }}"
   destination:
     name: CLUSTER
     namespace: observability

@@ -23,6 +23,9 @@ spec:
               port: 4317
         customConfig:
           data_dir: /vector-data
+          api:
+            enabled: true
+            address: 0.0.0.0:8686
           sources:
             otel:
               type: opentelemetry

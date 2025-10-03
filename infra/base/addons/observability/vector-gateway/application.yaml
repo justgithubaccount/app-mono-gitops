@@ -51,6 +51,13 @@ spec:
                 node: "{{`{{ resources.k8s.node.name }}`}}"
                 env: "{{`{{ resources.deployment.environment }}`}}"
 
+            debug:
+              type: console
+              inputs:
+                - otel.logs
+              encoding:
+                codec: json
+
   destination:
     name: CLUSTER
     namespace: observability

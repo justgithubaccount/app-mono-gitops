@@ -21,6 +21,8 @@ spec:
               port: 4318
             - name: otlp-grpc
               port: 4317
+            - name: api
+              port: 8686
         customConfig:
           data_dir: /vector-data
           api:

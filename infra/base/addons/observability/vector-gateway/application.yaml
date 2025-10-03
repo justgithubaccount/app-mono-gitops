@@ -43,13 +43,13 @@ spec:
               endpoint: http://loki.observability.svc.cluster.local:3100
               encoding:
                 codec: json
-            labels:
-              service_name: "{{ service.name }}"
-              namespace: "{{ k8s.namespace }}"
-              deployment: "{{ k8s.deployment.name }}"
-              container: "{{ k8s.container.name }}"
-              node: "{{ k8s.node.name }}"
-              env: "{{ deployment.environment }}"
+              labels:
+                service_name: "{{`{{ service.name }}`}}"
+                namespace: "{{`{{ k8s.namespace }}`}}"
+                deployment: "{{`{{ k8s.deployment.name }}`}}"
+                container: "{{`{{ k8s.container.name }}`}}"
+                node: "{{`{{ k8s.node.name }}`}}"
+                env: "{{`{{ deployment.environment }}`}}"
             debug:
               type: console
               inputs:

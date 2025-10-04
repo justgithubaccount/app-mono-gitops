@@ -63,7 +63,7 @@ spec:
               encoding:
                 codec: json
               labels:
-                "resources_*": "{{ resources }}"
+                "resources_*": "{{`{{ resources }}`}}"
                 stream: "otel"
               
           debug:

@@ -21,10 +21,7 @@ spec:
           type: ClusterIP
           port: 80
         ingress:
-          enabled: true
-          class: nginx
-          host: web.syncjob.ru
-          tls: true
+          enabled: false
         env:
           - name: OPENAI_API_KEY
             value: 

@@ -5,16 +5,29 @@
 - [x] [инфра] Через external dns автомазировать работу с клаудфлейр по части днс | Манифестов добавить  
 - [x] [инфра] Отладить хелм релиз для чат-апи | обернуть в апп-фор-аппс  
 - [x] [код] отладить базовый функционал чата (пройти смок паблик тест) | стейт перенести в постгрее  
+
 ### sec
 - [x] Добавить протект на майн-ветку | [проверить работу](https://github.com/justgithubaccount/app-release/actions/runs/16650220134/job/47120671590)
-- [ ] ...  
+- [ ] Подключить OIDC (identify provider) | keyclock или какой нибудь другой | [ref-1](https://longhorn.io/docs/1.10.0/deploy/accessing-the-ui/longhorn-ingress/), [ref-2](https://argo-cd.readthedocs.io/en/stable/operator-manual/user-management/keycloak/)  
+  - [ ] Связать всю систему (вэбки и прочие) через одну логику аутентификации  
+- [ ] Прочекать что за маркетиноговые словечки звучат в вакансиях DevSecOps | использовать
+
 ### code
 - [x] Убрать LiteLLM и сделать отдельный сервис, который будет напрямую ходить к OpenRouter
+  - [ ] Добавить драйвер OpenAI чтобы связать openwebui c **chat-сервисом**
 - [ ] Написать свой контролер | описываем схему через CRD | все в сути класс на го | все есть обьект | что сверху апишка, что снизу она же   
+- [ ] К вэбке (openwebui) подвязать кастамные фичи (элементы ui)
+- [ ] На базе Dify через API которое отдает агент подвязать его openwebui [ref](https://docs.openwebui.com/features/plugin/)
+- [ ] Передавать контекст в Dify от CrewAI (API, [MCP](github.com/rohitg00/kubectl-mcp-server)...)  
+- [ ] Использовать n8n... как тулзы на уровне вэбки для Dify и CrewAI
+
 ### infra 
 - [ ] Отладить getting-started | сменить кластер  
 - [ ] [запустить два+ кластера](https://github.com/justgithubaccount/app-release/blob/main/scripts/multi-cluster.yaml)  
-- [ ] применить паттерн от Арго - ApplicationSet  
+- [ ] применить паттерн от Арго - ApplicationSet, AppProject
+- [ ] Переделать структуру под [Платформу](misc/context/gitops/gitops-platform.md)  
+- [ ] Argo Rollouts...
+
 ### ci
 - [x] Добаваить тестов на предмет хелм рендеринда конфигов | добавить opa политики  
 - [x] Добавить [семантическое версионирование](https://semver.org/lang/ru/) + git-теги + хелм-релиз-логика
@@ -22,6 +35,8 @@
     - [ ] Доотладить argocd-image-updater так чтобы была согласованность между хелм-релизом и chat-values.yaml | [чтобы не перезаписывал файл](https://github.com/justgithubaccount/app-release/commit/8b5a4f709fe0aea9d897e42d968a7ca41f03a659) и все было логично и прозрачно
   - [ ] [High] Тестить сборку релиза перед мерджем, в самом pr  
   - [x] сonventional сommits | всё в .releaserc.json | встроить флоу для гита  
+  - [ ] Продумать послойную логику CI на всех уровнях | от среды кодерской до хелм-оберток...
+
 ### mesh
 - [ ] Добавить сервис по анализу [инцидентов](https://github.com/justgithubaccount/app-release/issues/5)
 - [ ] Продумать концепцию нейминга как под saas сервис
@@ -31,7 +46,14 @@
   - [ ] Обеспечить возможность править env на лету (например, через SIGHUP или альтернативный механизм) | холиварный вопрос на счет таких подходов
   - [ ] Определить сервисы через Service + Endpoints [?]
   - [ ] [mesh] Создать отдельный сервис через cdktf, чтобы инфра сама себя воспроизводила (всм как бы добавить терраформа, но через питон) 
+
 ### obs
   - [ ] отдать в локи, лог смены версии kubectl -n argocd logs -l app.kubernetes.io/name=argocd-image-updater --tail=200
   - [ ] отдать в локи по аналогии, данные со всех сущностей арго kubectl logs -n argocd deploy/argocd-server, kubectl logs -n argocd statefulset/argocd-application-controller, kubectl get pods -n argocd -l app.kubernetes.io/name=argocd-redis
   - [ ] отдать все данные в локи, о всех сервисах системы, чтобы это было привязанно в локи по лейблу | один лейбл = один сервис | автоматизировать | где-то был контролер который это делает все из коробки  
+  - [ ] Придумать как проверять добавить тестов для vector-пайплайнов | toml вместо yaml   
+  - [ ] VictoriaMetics...
+  - [ ] Tempo...
+
+### dbs
+  - [ ] Поцепить хранилки данных для работы системы

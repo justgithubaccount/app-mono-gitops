@@ -1,0 +1,72 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: linkerd
+  namespace: argocd
+  labels:
+    tier: cluster-addons
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  
+  source:
+    repoURL: https://helm.linkerd.io/
+    chart: linkerd-control-plane
+    targetRevision: 1.18.9
+    helm:
+      values: |
+        # indentity & mTLS
+        identity:
+          issuer:
+            scheme: kubernetes.io/tls
+            
+        # proxy config
+        proxy:
+          # opentelemetry integration
+          opaquePorts: "25,443,587,3306,5432,6379,9300,11211"
+          
+          resources:
+            cpu:
+              request: 100m
+              limit: 1000m
+            memory:
+              request: 20Mi
+              limit: 250Mi
+          
+          logLevel: warn
+          logFormat: json
+          
+          waitBeforeExitSeconds: 0
+          enableExternalProfiles: true
+
+        # policy
+        policyController:
+          logLevel: info
+          defaultAllowPolicy: "all-unauthenticated"
+
+        # observability
+        prometheus:
+          scrape: true
+          path: /metrics
+          port: 4191
+
+        # cluster
+        clusterDomain: cluster.local
+        enableEndpointSlices: true
+
+  destination:
+    name: CLUSTER
+    namespace: linkerd
+
+  syncPolicy:
+    automated:
+      allowEmpty: true
+      selfHeal: true
+      prune: true
+    syncOptions:
+      - Validate=true
+      - CreateNamespace=true
+      - PruneLast=true

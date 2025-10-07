@@ -17,7 +17,7 @@ resources:
   - ../../base/addons/observability/vector-gateway
   - ../../base/addons/argocd-image-updater
   - ../../base/addons/open-webui
-
+  - ../../base/addons/linkerd
 patches:
   # Override .spec.destination.name
   - path: destination.yaml

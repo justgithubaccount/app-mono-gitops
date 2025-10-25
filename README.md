@@ -1,7 +1,12 @@
 # 🧠 Bio AI Agent Infrastructure
 
-> Идет отладка - 95% (tst, dev)  
-> Next Up - DevOps Copilot  
+> Идет отладка - 95% (tst, dev) | 65% (stg) | prd (20%)  
+
+> Next Up - DevOps Copilot (по большой части можно на основе OpenWebUI сделать Copilot подключив к нему АPI сервисов и MCP для сервисов)  
+
+> Проект временно остановлен, все дампы памяти расписанны ниже в [Content](https://github.com/justgithubaccount/app-mono-gitops?tab=readme-ov-file#-%D1%81ontent-main)-секциях  
+> Дальньшая разработка начнется с добавления KeyClock, рефакторинга текущий структуры в `infra/` под [GitOps платформу](https://github.com/justgithubaccount/app-mono-gitops/pulls)...  
+> И самое важное гармонично вплести [Backstage](https://github.com/backstage/backstage)  
 
 ## Getting Started (Clear Install)
 

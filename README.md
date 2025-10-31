@@ -6,7 +6,7 @@
 
 > Проект временно остановлен, все дампы памяти расписанны ниже в [Content](https://github.com/justgithubaccount/app-mono-gitops?tab=readme-ov-file#-%D1%81ontent-main)-секциях  
 > Дальньшая разработка начнется с добавления KeyClock, рефакторинга текущий структуры в `infra/` под [GitOps платформу](https://github.com/justgithubaccount/app-mono-gitops/pulls)...  
-> И самое важное гармонично вплести [Backstage](https://github.com/backstage/backstage)  
+> И самое важное гармонично вплести [Backstage](https://github.com/backstage/backstage) + mesh (истио или линкерд, еще какой-то там был более-менее), и получить протатип cncf-gitops стека на 2025+  год + kaniko закрыт, форкнут, как то там оно счет иб, не понятно, особенно в связке с mtls  
 
 ## Getting Started (Clear Install)
 
